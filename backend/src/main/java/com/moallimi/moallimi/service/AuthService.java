@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,7 +19,6 @@ import com.moallimi.moallimi.model.Student;
 import com.moallimi.moallimi.model.Teacher;
 import com.moallimi.moallimi.model.User;
 import com.moallimi.moallimi.payload.request.SignupRequest;
-import com.moallimi.moallimi.payload.response.MessageResponse;
 import com.moallimi.moallimi.repository.RoleRepository;
 import com.moallimi.moallimi.repository.UserRepository;
 import com.moallimi.moallimi.security.services.UserDetailsImpl;
@@ -61,7 +59,7 @@ public class AuthService {
         // Create new user's account
         User user = null;
 
-        Set<String> strRoles = signUpRequest.getRole();
+        String strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
 
         if (strRoles == null || strRoles.isEmpty()) {
@@ -70,39 +68,37 @@ public class AuthService {
             roles.add(userRole);
             user = new Student();
         } else {
-            for (String role : strRoles) {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(EnumRole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
+            switch (strRoles) {
+                case "admin":
+                    Role adminRole = roleRepository.findByName(EnumRole.ROLE_ADMIN)
+                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    roles.add(adminRole);
 
-                        user = new Admin();
+                    user = new Admin();
 
-                        break;
+                    break;
 
-                    case "parent":
-                        Role parentRole = roleRepository.findByName(EnumRole.ROLE_PARENT)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(parentRole);
-                        user = new Parent();
-                        break;
+                case "parent":
+                    Role parentRole = roleRepository.findByName(EnumRole.ROLE_PARENT)
+                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    roles.add(parentRole);
+                    user = new Parent();
+                    break;
 
-                    case "teacher":
-                        Role teacherRole = roleRepository.findByName(EnumRole.ROLE_TEACHER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(teacherRole);
-                        user = new Teacher();
-                        break;
+                case "teacher":
+                    Role teacherRole = roleRepository.findByName(EnumRole.ROLE_TEACHER)
+                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    roles.add(teacherRole);
+                    user = new Teacher();
+                    break;
 
-                    default:
-                        Role userRole = roleRepository.findByName(EnumRole.ROLE_STUDENT)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                        user = new Student();
+                default:
+                    Role userRole = roleRepository.findByName(EnumRole.ROLE_STUDENT)
+                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    roles.add(userRole);
+                    user = new Student();
 
-                        break;
-                }
+                    break;
             }
         }
         if (user != null) {
@@ -117,5 +113,10 @@ public class AuthService {
         }
         User savedUser = userRepository.save(user);
         return savedUser != null;
+    }
+
+
+    public User getUserByUsername(String username){
+        return userRepository.findByUsername(username).get();
     }
 }

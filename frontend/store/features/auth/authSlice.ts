@@ -1,15 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '@/store/redux';
-
-export interface AuthState {
-    role: string;
-    isLoggedIn: boolean;
-    user: {
-        firstName: string;
-        email: string;
-        username: string;
-    };
-}
+import { registerUser } from './authAction';
+import { AuthState, UserData } from './authInterface';
 
 const initialState: AuthState = {
     role: 'student',
@@ -18,7 +10,10 @@ const initialState: AuthState = {
         firstName: '',
         email: '',
         username: ''
-    }
+    },
+    loading: false,
+    error: null,
+    successMessage: null
 };
 
 const authSlice = createSlice({
@@ -36,11 +31,34 @@ const authSlice = createSlice({
             state.user.firstName = profile.name;
             state.user.username = profile.name;
             state.user.email = profile.email;
+        },
+        SET_ERROR(state, action) {
+            state.error = action.payload;
+        },
+        SET_SUCCESS_MESSAGE(state, action) {
+            state.successMessage = action.payload;
         }
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(registerUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(registerUser.fulfilled, (state, action: PayloadAction<UserData>) => {
+                state.loading = false;
+                state.isLoggedIn = true;
+                state.user.email = action.payload.email;
+                state.successMessage = 'Registered successfully';
+            })
+            .addCase(registerUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
     }
 });
 
-export const { SET_LOGIN, SET_USER, SET_ROLE } = authSlice.actions;
+export const { SET_LOGIN, SET_USER, SET_ROLE, SET_ERROR, SET_SUCCESS_MESSAGE } = authSlice.actions;
 
 export const selectIsLoggedIn = (state: RootState) => state.auth.isLoggedIn;
 export const selectUser = (state: RootState) => state.auth.user;

@@ -1,20 +1,19 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { cookies as nextCookies } from 'next/headers';
-import { BACKEND_URL } from '@/utils/constants';
 import { JWT } from 'next-auth/jwt';
 import axiosInstance from '@/providers/axios.provider';
 
 async function refreshToken(token: string, refreshToken: string, expiresIn: number): Promise<any> {
     try {
-        const result: any = axiosInstance.post('/auth/refresh', {
+        const result: any = await axiosInstance.post('/api/auth/refreshtoken', {
             refreshToken: refreshToken,
             token: token
         });
 
-        if (result.error || !result.data || !result.data.refresh) return null;
+        if (result.error || !result.data?.token) return null;
 
-        return result.data.refresh;
+        return result.data;
     } catch (error) {
         return null;
     }
@@ -36,13 +35,15 @@ export const authOptions: NextAuthOptions = {
                 }
             },
             async authorize(credentials: any, req: any): Promise<any | null> {
-                if (!credentials.username || !credentials.password) return null;
+                if (!credentials.username || !credentials.password) {
+                    throw new Error('Invalid username or password');
+                }
 
                 const { username, password } = credentials;
 
                 try {
                     const result: any = await axiosInstance.post(
-                        '/auth/login',
+                        '/api/auth/signin',
                         {
                             username,
                             password
@@ -53,13 +54,11 @@ export const authOptions: NextAuthOptions = {
                             }
                         }
                     );
-
-                    if (!result || !result.data || !result.data.signin) {
-                        return null;
+                    if (!result.data?.signIn) {
+                        throw new Error('Invalid username or password');
                     }
 
-                    const data = result.data.signin;
-                    console.log(data);
+                    const data = result.data.signIn;
 
                     const token = data.token;
                     const refreshToken = data.refreshToken;
@@ -68,12 +67,8 @@ export const authOptions: NextAuthOptions = {
                     nextCookies().set('token', token);
                     nextCookies().set('refreshToken', refreshToken);
 
-                    delete data.token;
-                    delete data.refreshToken;
-                    delete data.expiresIn;
-
                     return {
-                        user: data,
+                        user: result.data,
                         tokens: {
                             token,
                             refreshToken,
@@ -81,8 +76,7 @@ export const authOptions: NextAuthOptions = {
                         }
                     };
                 } catch (error) {
-                    console.log(error);
-                    return null;
+                    throw new Error('Invalid username or password');
                 }
             }
         })
@@ -99,11 +93,8 @@ export const authOptions: NextAuthOptions = {
 
             if (!newPayload) return null;
 
-            const newUser = newPayload;
-            console.log('new token ');
-
             return {
-                user: newUser,
+                user: token.user,
                 tokens: {
                     token: newPayload.token,
                     refreshToken: newPayload.refreshToken,
@@ -121,5 +112,5 @@ export const authOptions: NextAuthOptions = {
     pages: {
         signIn: '/auth/login'
     },
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET
 };

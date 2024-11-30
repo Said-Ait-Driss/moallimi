@@ -7,20 +7,23 @@ import { SiBasicattentiontoken } from 'react-icons/si';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export default function SideBar() {
     const pathname = usePathname();
+    const { data: session, status } = useSession();
 
-    console.log("pathname :",pathname);
-    
     const isActive = (href: string) => pathname === href;
 
     return (
         <div className="flex flex-col mt-4 ml-8 w-64">
             <div className="flex items-center justify-center border rounded bg-lightPrimary ">
-                <Link href={'/dashboard/profile'} className="m-4">
+                <Link href={'/dashboard/profile'} className="m-4 text-center">
                     <Image src="/user-cover-2.png" alt="" width={80} height={80} className="rounded-full mx-auto" />
-                    <strong className="my-2">Said Ait Driss</strong>
+                    {
+                        status != 'loading' &&
+                        <strong className="my-2 text-center mx-auto"> {session?.user.username}</strong>
+                    }
                     <div>
                         <small>Welcome back !</small>
                     </div>

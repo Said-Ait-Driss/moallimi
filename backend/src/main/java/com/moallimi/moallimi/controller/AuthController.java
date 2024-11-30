@@ -1,8 +1,6 @@
 package com.moallimi.moallimi.controller;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,27 +11,21 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moallimi.moallimi.enums.EnumRole;
 import com.moallimi.moallimi.exception.TokenRefreshException;
 import com.moallimi.moallimi.model.RefreshToken;
-import com.moallimi.moallimi.model.Role;
-import com.moallimi.moallimi.model.User;
 import com.moallimi.moallimi.payload.request.LoginRequest;
+import com.moallimi.moallimi.payload.request.RefreshTokenRequest;
 import com.moallimi.moallimi.payload.request.SignupRequest;
 import com.moallimi.moallimi.payload.response.MessageResponse;
+import com.moallimi.moallimi.payload.response.SignIn;
 import com.moallimi.moallimi.payload.response.UserInfoResponse;
-import com.moallimi.moallimi.repository.RoleRepository;
 import com.moallimi.moallimi.security.jwt.JwtUtils;
 import com.moallimi.moallimi.security.services.RefreshTokenService;
 import com.moallimi.moallimi.security.services.UserDetailsImpl;
@@ -75,7 +67,8 @@ public class AuthController {
         .body(new UserInfoResponse(userDetails.getId(),
             userDetails.getUsername(),
             userDetails.getEmail(),
-            roles));
+            roles,
+            new SignIn(jwtCookie.getValue(), jwtRefreshCookie.getValue(), jwtCookie.getMaxAge().toMillis())));
   }
 
   @PostMapping("/signup")
@@ -108,8 +101,8 @@ public class AuthController {
   }
 
   @PostMapping("/refreshtoken")
-  public ResponseEntity<?> refreshtoken(HttpServletRequest request) {
-    String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
+  public ResponseEntity<?> refreshtoken(@RequestBody RefreshTokenRequest refreshTokenToken) {
+    String refreshToken = refreshTokenToken.getRefreshToken();
 
     if ((refreshToken != null) && (refreshToken.length() > 0)) {
       return refreshTokenService.findByToken(refreshToken)
@@ -120,7 +113,7 @@ public class AuthController {
 
             return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(new MessageResponse("Token is refreshed successfully!"));
+                .body(new SignIn(jwtCookie.getValue(), refreshToken, jwtCookie.getMaxAge().toMillis()));
           })
           .orElseThrow(() -> new TokenRefreshException(refreshToken,
               "Refresh token is not in database!"));

@@ -4,6 +4,9 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ReduxProvider } from '@/providers/redux.provider';
 import NavBar from '@/components/shared/navbar';
+import { SessionProvider } from 'next-auth/react';
+import SessionsProvider from '@/providers/session.provider';
+
 
 const geistSans = localFont({
     src: './fonts/GeistVF.woff',
@@ -23,13 +26,15 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-          <ReduxProvider>
-            <body className={inter.className}>
-              <NavBar></NavBar>
-                {children}
-            </body>
-            </ReduxProvider>
-        </html>
+        <SessionsProvider>
+            <html lang="en">
+            <ReduxProvider>
+                <body className={inter.className}>
+                <NavBar></NavBar>
+                    {children}
+                </body>
+                </ReduxProvider>
+            </html>
+        </SessionsProvider>
     );
 }
