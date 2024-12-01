@@ -41,8 +41,6 @@ export default function Register() {
         }
         dispatch(SET_ERROR(''));
         const resultAction = await dispatch(registerUser(user));
-        console.log(resultAction);
-        
         if (registerUser.fulfilled.match(resultAction)) {
             router.replace('/auth/login');
         }

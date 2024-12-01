@@ -64,8 +64,8 @@ export const authOptions: NextAuthOptions = {
                     const refreshToken = data.refreshToken;
                     const expiresIn = data.expiresIn;
 
-                    nextCookies().set('token', token);
-                    nextCookies().set('refreshToken', refreshToken);
+                    nextCookies().set('moallimi-jwt', token);
+                    nextCookies().set('moallimi-jwt-refresh', refreshToken);
 
                     return {
                         user: result.data,
@@ -86,7 +86,6 @@ export const authOptions: NextAuthOptions = {
             if (user) return { ...token, ...user };
 
             const currentDateTime = new Date().getTime();
-
             if (currentDateTime < token.tokens.expiresIn) return token;
             // token is expired then refresh token
             const newPayload = await refreshToken(token.tokens.token, token.tokens.refreshToken, token.tokens.expiresIn);
@@ -110,7 +109,8 @@ export const authOptions: NextAuthOptions = {
         }
     },
     pages: {
-        signIn: '/auth/login'
+        signIn: '/auth/login',
+        error: '/auth/login'
     },
     secret: process.env.NEXTAUTH_SECRET
 };

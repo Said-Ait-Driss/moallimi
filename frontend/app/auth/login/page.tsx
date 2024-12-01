@@ -1,40 +1,58 @@
 'use client';
 import { selectRole } from '@/store/features/auth/authSlice';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useRef } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ErrorAlert from '@/components/shared/errorAlert';
+import { BiLoader } from 'react-icons/bi';
 
 export default function Login() {
     const role = useSelector(selectRole);
     const username = useRef('');
     const password = useRef('');
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [error, setError] = React.useState('');
+    const [loading, setLoading] = React.useState(false);
+
+
+    useEffect(()=>{
+        if(searchParams.has("error")){
+            setError(searchParams.get("error") ?? "");
+        }
+    },[])
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        try {
+            if (!username.current || !password.current) {
+                setError('all fileds are mendatory');
+                return;
+            }
 
-        const result = await signIn('credentials', {
-            username: username.current,
-            password: password.current,
-            role,
-            redirect: true,
-            callbackUrl: '/dashboard/state'
-        });
+            setLoading(true);
+            const result = await signIn('credentials', {
+                username: username.current,
+                password: password.current,
+                role,
+                redirect: true,
+                callbackUrl: '/dashboard/state'
+            });
 
-        console.log(result);
-        
-        if (result?.error) {
-            setError(result?.error);
-        } else {
-            setError("")
-            router.push('/dashboard/state');
+            if (result?.error) {
+                setError(result?.error);
+            } else {
+                setError('');
+                router.push('/dashboard/lesson');
+            }
+        } catch (error) {
+            setError('service not available at the moment . please contact the support');
+        } finally {
+            setLoading(false);
         }
-        console.log(result);
     };
 
     return (
@@ -49,7 +67,7 @@ export default function Login() {
                 </p>
             </div>
             <div className="flex-1 p-4 pe-0 mt-40">
-                <form className="bg-transparent rounded-lg p-4" method="POST" action={'/auth/login'} onSubmit={onSubmit}>
+                <form className="bg-transparent rounded-lg p-4" method="POST" onSubmit={onSubmit}>
                     <div className="flex flex-col gap-4 mb-2">{error && <ErrorAlert title="Sign in attempt filed" message={error} />}</div>
                     <div className="flex flex-col gap-4 mb-2">
                         <label htmlFor="username" className="text-secondText font-base">
@@ -77,7 +95,9 @@ export default function Login() {
                             onChange={(e) => (password.current = e.target.value)}
                         />
                     </div>
-                    <button className="bg-primary w-full max-w-xl rounded-lg p-4 text-white font-bold block mt-8">LOG IN</button>
+                    <button disabled={loading} className="bg-primary w-full max-w-xl rounded-lg p-4 text-white font-bold block mt-8">
+                        {loading ? <BiLoader className="mx-auto" /> : 'LOG IN'}
+                    </button>
                 </form>
             </div>
         </div>

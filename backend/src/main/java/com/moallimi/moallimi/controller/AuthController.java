@@ -1,5 +1,6 @@
 package com.moallimi.moallimi.controller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,7 @@ import com.moallimi.moallimi.service.AuthService;
 
 //for Angular Client (withCredentials)
 //@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600, allowCredentials="true")
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials="true")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -68,7 +69,7 @@ public class AuthController {
             userDetails.getUsername(),
             userDetails.getEmail(),
             roles,
-            new SignIn(jwtCookie.getValue(), jwtRefreshCookie.getValue(), jwtCookie.getMaxAge().toMillis())));
+            new SignIn(jwtCookie.getValue(), jwtRefreshCookie.getValue(), new Date().getTime() + jwtCookie.getMaxAge().toMillis() - 4)));
   }
 
   @PostMapping("/signup")
@@ -113,7 +114,8 @@ public class AuthController {
 
             return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(new SignIn(jwtCookie.getValue(), refreshToken, jwtCookie.getMaxAge().toMillis()));
+                .body(new SignIn(jwtCookie.getValue(), refreshToken,
+                    new Date().getTime() + jwtCookie.getMaxAge().toMillis() - 4));
           })
           .orElseThrow(() -> new TokenRefreshException(refreshToken,
               "Refresh token is not in database!"));

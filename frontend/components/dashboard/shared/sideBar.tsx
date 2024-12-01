@@ -20,10 +20,7 @@ export default function SideBar() {
             <div className="flex items-center justify-center border rounded bg-lightPrimary ">
                 <Link href={'/dashboard/profile'} className="m-4 text-center">
                     <Image src="/user-cover-2.png" alt="" width={80} height={80} className="rounded-full mx-auto" />
-                    {
-                        status != 'loading' &&
-                        <strong className="my-2 text-center mx-auto"> {session?.user.username}</strong>
-                    }
+                    {status != 'loading' && <strong className="my-2 text-center mx-auto"> {session?.user.username}</strong>}
                     <div>
                         <small>Welcome back !</small>
                     </div>
@@ -36,17 +33,22 @@ export default function SideBar() {
                             <div className="text-sm font-light tracking-wide text-gray-500">Menu</div>
                         </div>
                     </li>
-                    <li>
-                        <Link
-                            href="/dashboard/state"
-                            className={`relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 hover:border-primary pr-6 ${isActive('/dashboard/state') ? ' border-l-4 border-primary bg-gray-50' : ''}`}
-                        >
-                            <span className="inline-flex justify-center items-center ml-4">
-                                <MdOutlineSpaceDashboard />
-                            </span>
-                            <span className="ml-2 text-sm tracking-wide truncate">Dashboard</span>
-                        </Link>
-                    </li>
+                    {status != 'loading' && session?.user.roles.includes('ROLE_ADMIN') ? (
+                        <li>
+                            <Link
+                                href="/dashboard/state"
+                                className={`relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 hover:border-primary pr-6 ${isActive('/dashboard/state') ? ' border-l-4 border-primary bg-gray-50' : ''}`}
+                            >
+                                <span className="inline-flex justify-center items-center ml-4">
+                                    <MdOutlineSpaceDashboard />
+                                </span>
+                                <span className="ml-2 text-sm tracking-wide truncate">Dashboard</span>
+                            </Link>
+                        </li>
+                    ) : (
+                        ''
+                    )}
+
                     <li>
                         <Link
                             href="/dashboard/student"
@@ -94,18 +96,22 @@ export default function SideBar() {
                             <span className="px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-red-500 bg-red-50 rounded-full">1.2k</span>
                         </Link>
                     </li>
-                    <li>
-                        <Link
-                            href="/dashboard/subscription"
-                            className={`relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 hover:border-primary pr-6 ${isActive('/dashboard/subscription') ? ' border-l-4 border-primary bg-gray-50' : ''}`}
-                        >
-                            <span className="inline-flex justify-center items-center ml-4">
-                                <SiBasicattentiontoken />
-                            </span>
-                            <span className="ml-2 text-sm tracking-wide truncate">Subscriptions</span>
-                            <span className="px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-red-500 bg-red-50 rounded-full">1.2k</span>
-                        </Link>
-                    </li>
+                    {status != 'loading' && session?.user.roles.includes('ROLE_ADMIN') ? (
+                        <li>
+                            <Link
+                                href="/dashboard/subscription"
+                                className={`relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 hover:border-primary pr-6 ${isActive('/dashboard/subscription') ? ' border-l-4 border-primary bg-gray-50' : ''}`}
+                            >
+                                <span className="inline-flex justify-center items-center ml-4">
+                                    <SiBasicattentiontoken />
+                                </span>
+                                <span className="ml-2 text-sm tracking-wide truncate">Subscriptions</span>
+                                <span className="px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-red-500 bg-red-50 rounded-full">
+                                    1.2k
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
                 </ul>
             </div>
 

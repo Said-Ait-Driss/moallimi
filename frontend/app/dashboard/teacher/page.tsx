@@ -1,15 +1,27 @@
-
-"use client"
+'use client';
 
 import SearchTeacher from '@/components/dashboard/teacher/search';
 import TeacherCard from '@/components/dashboard/teacher/teacherCard';
-import { useState } from 'react';
+import { useAppDispatch } from '@/hooks/appHooks';
+import { teachersList } from '@/store/features/teacher/teacherAction';
+import { RootState } from '@/store/redux';
+import { useEffect, useState } from 'react';
 import { CgClose } from 'react-icons/cg';
+import { useSelector } from 'react-redux';
 
 const teachers = [{}, {}, {}, {}];
 
 export default function Teacher() {
     const [inforOpen, setInfoOpen] = useState(true);
+    const dispatch = useAppDispatch();
+    const loading = useSelector((state: RootState) => state.teacher.loading);
+    const teachers: any = useSelector((state: RootState) => state.teacher.teachers);
+    const error = useSelector((state: RootState) => state.teacher.error);
+
+    useEffect(() => {
+        const result = dispatch(teachersList({ page: 0, size: 10 }));
+        console.log(teachers);
+    }, []);
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-6">
@@ -21,7 +33,7 @@ export default function Teacher() {
                         <p className="mt-4 max-w-xl mx-auto text-base text-gray-500">
                             The secret to a tidy desk? Don't get rid of anything, just put it in really really nice looking containers.
                         </p>
-                        <button onClick={()=>setInfoOpen(false)} className="absolute top-4 right-3">
+                        <button onClick={() => setInfoOpen(false)} className="absolute top-4 right-3">
                             <CgClose />
                         </button>
                     </div>
@@ -32,9 +44,9 @@ export default function Teacher() {
                     <span className="text-black text-md font-semibold leading-8 px-8 py-3">Feed</span>
                     <div className="flex-1 border-b border-gray-300"></div>
                 </div>
-                {teachers.map((item) => (
-                    <TeacherCard />
-                ))}
+                <div className=' grid grid-cols-2 sm:mx-0 md:grid-cols-3'>
+                    {loading ? 'loading' : teachers?.content?.map((item: any) => <TeacherCard teacher={item.teacher} reviews={item.reviews} key={item.teacher?.id} />) || null}
+                </div>
             </section>
             <div className="col-span-3">
                 <div className="flex items-center justify-center border rounded bg-lightPrimary max-w-72">

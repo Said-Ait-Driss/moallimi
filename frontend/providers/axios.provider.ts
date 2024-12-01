@@ -5,9 +5,10 @@ const axiosInstance = axios.create({
     baseURL: BACKEND_URL,
     timeout: 10000,
     headers: {
-        'Content-Type': 'application/json'
-        // 'Authorization': 'Bearer YOUR_ACCESS_TOKEN', Optional: Add authorization token if needed
-    }
+        'Content-Type': 'application/json',
+        'Accept':'*',
+    },
+    withCredentials: true
 });
 
 export default axiosInstance;
