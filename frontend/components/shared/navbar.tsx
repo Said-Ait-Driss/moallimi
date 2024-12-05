@@ -10,7 +10,6 @@ import { SET_ROLE } from '@/store/features/auth/authSlice';
 import { useSession } from 'next-auth/react';
 import { Fragment } from 'react';
 import { Menu, Transition } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import { signOut } from 'next-auth/react';
 
 function classNames(...classes: any) {
@@ -32,8 +31,9 @@ export default function NavBar() {
         router.push(path);
     };
 
-    const logout = () => {
-        signOut({ callbackUrl: '/auth/login' });
+    const logout = async (e:any) => {
+        e.preventDefault()
+        await signOut({ callbackUrl: "/auth/login", redirect: true  });
     };
     return (
         <nav className="bg-lightPrimary p-4 md:px-28">

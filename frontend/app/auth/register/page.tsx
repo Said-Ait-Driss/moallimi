@@ -23,6 +23,8 @@ export default function Register() {
     const [user, setUser] = useState({
         username: '',
         email: '',
+        firstName: '',
+        lastName: '',
         password: '',
         role
     });
@@ -35,7 +37,7 @@ export default function Register() {
 
     const registerHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!user.email || !user.password || !user.username) {
+        if (!user.email || !user.password || !user.username || !user.firstName || !user.lastName) {
             dispatch(SET_ERROR('all fileds are mendatory'));
             return;
         }
@@ -47,7 +49,7 @@ export default function Register() {
     };
     return (
         <div className="flex bg-lightPrimary min-h-screen">
-            <div className="flex-1 p-4 ps-28 mt-28">
+            <div className="flex-1 p-4 ps-28 mt-12">
                 <h3 className="text-primaryText font-bold text-8xl my-8 leading-snug">SIGN UP AS {role?.toUpperCase()} FOR IMMEDIATE ACCESS </h3>
                 <p className="text-secondText font-base my-8">
                     If you already have an account. you can{' '}
@@ -56,7 +58,7 @@ export default function Register() {
                     </Link>
                 </p>
             </div>
-            <div className="flex-1 p-4 pe-0 mt-40">
+            <div className="flex-1 p-4 pe-0 mt-20">
                 <form className="bg-transparent rounded-lg p-4" onSubmit={registerHandler}>
                     <div className="flex flex-col gap-4  max-w-xl">
                         {error && <ErrorAlert title="There were errors with your submission" message={error} />}
@@ -88,6 +90,34 @@ export default function Register() {
                             className="bg-lightSecondary rounded-lg p-4 max-w-xl"
                             value={user.email}
                             onChange={(e: any) => setUser({ ...user, email: e.target.value })}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-4 mb-2">
+                        <label htmlFor="firstName" className="text-secondText font-base">
+                            First Name :{' '}
+                        </label>
+                        <input
+                            type="firstName"
+                            required
+                            placeholder="Your first name"
+                            id="firstName"
+                            className="bg-lightSecondary rounded-lg p-4 max-w-xl"
+                            value={user.firstName}
+                            onChange={(e: any) => setUser({ ...user, firstName: e.target.value })}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-4 mb-2">
+                        <label htmlFor="lastName" className="text-secondText font-base">
+                        Last Name :{' '}
+                        </label>
+                        <input
+                            type="lastName"
+                            required
+                            placeholder="Your last name here"
+                            id="lastName"
+                            className="bg-lightSecondary rounded-lg p-4 max-w-xl"
+                            value={user.lastName}
+                            onChange={(e: any) => setUser({ ...user, lastName: e.target.value })}
                         />
                     </div>
                     <div className="flex flex-col gap-4 mb-2">

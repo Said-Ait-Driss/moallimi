@@ -5,7 +5,12 @@ import GeneralSettings from '@/components/dashboard/setting/generalSetting';
 import NotificationsSettings from '@/components/dashboard/setting/notificationSetting';
 import PasswordSettings from '@/components/dashboard/setting/passwordSetting';
 import PlanSetting from '@/components/dashboard/setting/planSetting';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { signOut, useSession } from 'next-auth/react';
+import { useAppDispatch } from '@/hooks/appHooks';
+import { profile } from '@/store/features/profile/profileAction';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/redux';
 
 const tabs = [
     { name: 'General', href: '#', current: true },
@@ -19,13 +24,25 @@ function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ');
 }
 
-
-
-
-
-
 export default function Example() {
     const [selectedOption, setSelectedOption] = useState(tabs[0].name);
+    const { data: session, status } = useSession();
+    const dispatch = useAppDispatch();
+
+    const profileData: any = useSelector((state: RootState) => state.profile.profile);
+    const loading: any = useSelector((state: RootState) => state.profile.loading);
+    const error: any = useSelector((state: RootState) => state.lesson.error);
+
+    useEffect(() => {
+        if (!session?.user.id) {
+            signOut({ callbackUrl: '/auth/login', redirect: true });
+            return;
+        }
+        const result = dispatch(profile({ userId: session?.user.id }));
+        return () => {
+            result.abort();
+        };
+    }, []);
 
     const handleSelectedOption = (value: any) => {
         setSelectedOption(value);
@@ -64,7 +81,7 @@ export default function Example() {
                                         </div>
                                     </div>
                                     <div className="py-6">
-                                        {selectedOption === 'General' && <GeneralSettings />}
+                                        {selectedOption === 'General' && (loading ? 'loading' : <GeneralSettings profile={profileData} />)}
                                         {selectedOption === 'Password' && <PasswordSettings />}
                                         {selectedOption === 'Notifications' && <NotificationsSettings />}
                                         {selectedOption === 'Plan' && <PlanSetting />}
