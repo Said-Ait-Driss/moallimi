@@ -18,12 +18,12 @@ export default function SideBar() {
     return (
         <div className="flex flex-col mt-4 ml-8 w-64">
             <div className="flex items-center justify-center border rounded bg-lightPrimary ">
-                <Link href={'/dashboard/profile'} className="m-4 text-center">
+                <Link href={'/dashboard/profile?id='+session?.user.id} className="m-4 text-center">
                     <Image src="/user-cover-2.png" alt="" width={80} height={80} className="rounded-full mx-auto" />
-                    {status != 'loading' && <strong className="my-2 text-center mx-auto"> {session?.user.username}</strong>}
-                    <div>
-                        <small>Welcome back !</small>
+                    <div className='text-center'>
+                        <small className='text-center'>Welcome back !</small>
                     </div>
+                    {status != 'loading' && <strong className="my-4 text-center mx-auto"> {session?.user.firstName + " "+ session?.user.lastName}</strong>}
                 </Link>
             </div>
             <div className="max-h-96 overflow-y-auto overflow-x-hidden flex-grow border rounded bg-lightPrimary my-2">
@@ -124,7 +124,7 @@ export default function SideBar() {
                     </li>
                     <li>
                         <Link
-                            href="/dashboard/profile"
+                            href={"/dashboard/profile?id=" + session?.user.id}
                             className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-primary pr-6"
                         >
                             <span className="inline-flex justify-center items-center ml-4">

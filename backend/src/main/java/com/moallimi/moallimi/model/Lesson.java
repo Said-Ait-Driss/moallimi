@@ -8,12 +8,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Data;
-import com.moallimi.moallimi.enums.StudyType;
 
 @Entity
 @Data
@@ -23,7 +22,6 @@ public class Lesson {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     private String title;
     private Date date;
     private String description;
@@ -32,13 +30,16 @@ public class Lesson {
     private LocalTime starTime;
     private LocalTime endTime;
 
-    @OneToOne
+    @ManyToOne
     private LessonCategory lessonCategory;
 
-    @OneToOne
+    @ManyToOne
+    private Teacher teacher;
+
+    @ManyToOne
     private Classe classe;
 
-    @OneToOne
+    @ManyToOne
     private LessonType lessonType;
 
     private Boolean isValidated = false;

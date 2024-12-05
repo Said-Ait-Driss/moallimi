@@ -2,6 +2,7 @@
 
 import SearchTeacher from '@/components/dashboard/teacher/search';
 import TeacherCard from '@/components/dashboard/teacher/teacherCard';
+import ErrorAlert from '@/components/shared/errorAlert';
 import { useAppDispatch } from '@/hooks/appHooks';
 import { teachersList } from '@/store/features/teacher/teacherAction';
 import { RootState } from '@/store/redux';
@@ -9,7 +10,6 @@ import { useEffect, useState } from 'react';
 import { CgClose } from 'react-icons/cg';
 import { useSelector } from 'react-redux';
 
-const teachers = [{}, {}, {}, {}];
 
 export default function Teacher() {
     const [inforOpen, setInfoOpen] = useState(true);
@@ -19,8 +19,10 @@ export default function Teacher() {
     const error = useSelector((state: RootState) => state.teacher.error);
 
     useEffect(() => {
-        const result = dispatch(teachersList({ page: 0, size: 10 }));
-        console.log(teachers);
+        const result = dispatch(teachersList({ page: 0, size: 9 }));
+        return () => {
+            result.abort()
+        }
     }, []);
 
     return (
@@ -44,8 +46,14 @@ export default function Teacher() {
                     <span className="text-black text-md font-semibold leading-8 px-8 py-3">Feed</span>
                     <div className="flex-1 border-b border-gray-300"></div>
                 </div>
-                <div className=' grid grid-cols-2 sm:mx-0 md:grid-cols-3'>
-                    {loading ? 'loading' : teachers?.content?.map((item: any) => <TeacherCard teacher={item.teacher} reviews={item.reviews} key={item.teacher?.id} />) || null}
+                <div>
+                    {
+                        error ? <ErrorAlert title="service not available right now" message="something wrong went happened please try later ." /> : ""
+                    }
+                </div>
+                <div className='grid grid-cols-2 sm:mx-0 md:grid-cols-3'>
+
+                    {loading && !error ? 'loading' : teachers?.content?.map((item: any) => <TeacherCard teacher={item.teacher} reviews={item.reviews} key={item.teacher?.id} />) || null}
                 </div>
             </section>
             <div className="col-span-3">

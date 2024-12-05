@@ -13,7 +13,6 @@ import { Menu, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import { signOut } from 'next-auth/react';
 
-
 function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ');
 }
@@ -33,9 +32,9 @@ export default function NavBar() {
         router.push(path);
     };
 
-    const logout = ()=> {
+    const logout = () => {
         signOut({ callbackUrl: '/auth/login' });
-    }
+    };
     return (
         <nav className="bg-lightPrimary p-4 md:px-28">
             <div className="container mx-auto flex justify-between items-center">
@@ -78,9 +77,12 @@ export default function NavBar() {
                         <div className="hidden md:flex space-x-4">
                             <Menu as="div" className="relative inline-block text-left">
                                 <div>
-                                    <Menu.Button className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-primary">
-                                        My Profile
-                                        <ChevronDownIcon className="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
+                                    <Menu.Button className={`inline-flex justify-center w-full rounded-full border border-gray-300 shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 ring-2 ring-offset-2 ring-offset-gray-100 ${session?.user?.roles?.[0] == 'ROLE_STUDENT' ? 'ring-primary outline-primary' : 'ring-indigo-400 outline-indigo-400'}`}>
+                                        <span className="inline-block h-10 w-10 rounded-full overflow-hidden bg-gray-100">
+                                            <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                            </svg>
+                                        </span>
                                     </Menu.Button>
                                 </div>
 
@@ -96,9 +98,7 @@ export default function NavBar() {
                                     <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none">
                                         <div className="px-4 py-3">
                                             <p className="text-sm">Signed in as</p>
-                                            <p className="text-sm font-medium text-gray-900 truncate">
-                                                {session?.user?.email }
-                                            </p>
+                                            <p className="text-sm font-medium text-gray-900 truncate">{session?.user?.email}</p>
                                         </div>
                                         <div className="py-1">
                                             <Menu.Item>
@@ -145,7 +145,8 @@ export default function NavBar() {
                                             <form method="POST" action="#">
                                                 <Menu.Item>
                                                     {({ active }) => (
-                                                        <button onClick={logout}
+                                                        <button
+                                                            onClick={logout}
                                                             type="submit"
                                                             className={classNames(
                                                                 active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',

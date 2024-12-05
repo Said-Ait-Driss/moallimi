@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.moallimi.moallimi.enums.Gender;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -47,7 +48,10 @@ public class User {
   private String address;
   private Date birthDate;
   private String image;
+  private String cover;
   private String city;
+  private String about;
+  private Gender gender;
   private Boolean isDeleted = false;
   private Boolean isSuspended = false;
 

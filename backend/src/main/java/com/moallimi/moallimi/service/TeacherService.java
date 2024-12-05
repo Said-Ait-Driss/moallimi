@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.moallimi.moallimi.model.Review;
 import com.moallimi.moallimi.model.Teacher;
+import com.moallimi.moallimi.model.User;
 import com.moallimi.moallimi.payload.dto.ReviewStatDTO;
 import com.moallimi.moallimi.payload.response.TeachersWithReviewsDTO;
 import com.moallimi.moallimi.repository.ReviewRepository;
@@ -46,5 +47,9 @@ public class TeacherService {
 
     public List<Teacher> getAllTeachers() {
         return this.teacherRepository.findAll();
+    }
+
+    public Teacher getTeacherProfile(Long userId) {
+        return teacherRepository.findById(userId).orElse(null);
     }
 }

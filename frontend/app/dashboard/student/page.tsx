@@ -1,42 +1,27 @@
 'use client';
 
 import StudentCard from '@/components/dashboard/student/studentCard';
-import { useState } from 'react';
+import ErrorAlert from '@/components/shared/errorAlert';
+import { useAppDispatch } from '@/hooks/appHooks';
+import { studentsList } from '@/store/features/student/studentAction';
+import { RootState } from '@/store/redux';
+import { useEffect, useState } from 'react';
 import { CgClose } from 'react-icons/cg';
-
-const people = [
-    {
-        name: 'Jane Cooper',
-        nbreOfEngagedClasses: 12,
-        academicLevel: '1 Bac ',
-        email: 'jane.cooper@example.com',
-        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60'
-    },
-    {
-        name: 'Jane Cooper',
-        nbreOfEngagedClasses: 12,
-        academicLevel: '2 Bac',
-        email: 'jane.cooper@example.com',
-        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60'
-    },
-    {
-        name: 'Jane Cooper',
-        nbreOfEngagedClasses: 12,
-        academicLevel: '6 eme college',
-        email: 'jane.cooper@example.com',
-        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60'
-    },
-    {
-        name: 'Jane Cooper',
-        nbreOfEngagedClasses: 12,
-        academicLevel: '1 Primary Student',
-        email: 'jane.cooper@example.com',
-        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60'
-    }
-];
+import { useSelector } from 'react-redux';
 
 export default function Student() {
     const [inforOpen, setInfoOpen] = useState(true);
+    const dispatch = useAppDispatch();
+    const loading = useSelector((state: RootState) => state.student.loading);
+    const students: any = useSelector((state: RootState) => state.student.students);
+    const error = useSelector((state: RootState) => state.student.error);
+
+    useEffect(() => {
+        const result = dispatch(studentsList({ page: 0, size: 18 }));
+        return () => {
+            result.abort();
+        };
+    }, []);
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-6">
@@ -120,12 +105,9 @@ export default function Student() {
                     <span className="text-black text-md font-semibold leading-8 px-8 py-3">Feed</span>
                     <div className="flex-1 border-b border-gray-300"></div>
                 </div>
-                <div className="relative flex w-full min-w-max flex-col rounded-lg border border-slate-200 bg-white shadow-sm mx-auto">
-                    <nav className="flex min-w-[240px] flex-col gap-1 p-1.5">
-                        {people.map((person, index) => (
-                            <StudentCard student={person} />
-                        ))}
-                    </nav>
+                <div className="grid grid-cols-2 sm:mx-0 md:grid-cols-3">
+                    {error ? <ErrorAlert title="service not available right now" message="something wrong went happened please try later ." /> : ''}
+                    {loading && !error ? 'loading' : students.content?.map((student: any) => <StudentCard student={student} />)}
                 </div>
             </div>
             <div className="col-span-3">

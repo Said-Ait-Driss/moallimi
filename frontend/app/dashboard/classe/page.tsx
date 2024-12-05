@@ -1,11 +1,15 @@
 'use client';
 
 import ClasseCard from '@/components/dashboard/classe/classeCard';
-import { StarIcon } from '@heroicons/react/24/solid';
-import { useState } from 'react';
+import ErrorAlert from '@/components/shared/errorAlert';
+import { useAppDispatch } from '@/hooks/appHooks';
+import { classesList } from '@/store/features/classe/classeAction';
+import { RootState } from '@/store/redux';
+import { useEffect, useState } from 'react';
 import { CgClose } from 'react-icons/cg';
+import { useSelector } from 'react-redux';
 
-const classes = [
+const _classes = [
     {
         id: 1,
         name: 'Organize Basic Set (Walnut)',
@@ -62,12 +66,22 @@ const classes = [
     }
 ];
 
-function classNames(...classes: any) {
-    return classes.filter(Boolean).join(' ');
-}
-
 export default function Classe() {
     const [inforOpen, setInfoOpen] = useState(true);
+
+    const dispatch = useAppDispatch();
+
+    const classes: any = useSelector((state: RootState) => state.classe.classes);
+    const loading: any = useSelector((state: RootState) => state.classe.loading);
+    const error: any = useSelector((state: RootState) => state.lesson.error);
+
+    useEffect(() => {
+        const result = dispatch(classesList());
+        return () => {
+            result.abort();
+        };
+    }, []);
+
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-6">
             <div className="col-span-1"></div>
@@ -89,13 +103,17 @@ export default function Classe() {
                     <div className="flex-1 border-b border-gray-300"></div>
                 </div>
                 <div className="max-w-3xl mx-auto overflow-hidden sm:px-6 lg:px-4">
-                    <h2 className="sr-only">Products</h2>
-
-                    <div className="-mx-px border-l border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3">
-                        {classes.map((classe) => (
-                            <ClasseCard classe={classe}/>
-                        ))}
-                    </div>
+                    <h2 className="sr-only">Classes</h2>
+                    {error ? <ErrorAlert title="service not available right now" message="Something wrong went happened please try later ." /> : ''}
+                    {loading ? (
+                        'loading'
+                    ) : (
+                        <div className="-mx-px border-l border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3">
+                            {classes.map((classe: any) => (
+                                <ClasseCard key={classe.id} classe={classe} />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="col-span-3">

@@ -2,10 +2,21 @@
 
 import { ChevronRightIcon, ShareIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
-import { BellAlertIcon  } from '@heroicons/react/24/outline';
+import { BellAlertIcon, StarIcon } from '@heroicons/react/24/solid';
 import { BiComment, BiWorld } from 'react-icons/bi';
 import { Fragment, useState } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, DialogBackdrop, Transition } from '@headlessui/react';
+import { CgRemote } from 'react-icons/cg';
+import { FaLocationArrow, FaRegCalendarAlt, FaRegClock } from 'react-icons/fa';
+import { HiLocationMarker, HiOutlineLocationMarker } from 'react-icons/hi';
+import { getLessonSubscribers, subscribeToLesson, unsubscribeToLesson } from '@/store/features/lessonSubscription/lessonSubscriptionAction';
+import { useAppDispatch } from '@/hooks/appHooks';
+import { useSession } from 'next-auth/react';
+import Notification from '@/components/shared/Notification';
+import { SET_LESSON_SUBSCRIBED, SET_LESSON_UNSUBSCRIBED } from '@/store/features/lesson/lessonSlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/redux';
+import LessonSubscriber from './lessonSubscriber';
 
 const candidates = [
     {
@@ -14,7 +25,7 @@ const candidates = [
         academicLevel: '1 bac',
         imageUrl:
             'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-        appliedDatetime: '2020-07-01T15:34:56',
+        appliedDatetime: '2020-07-01T15:34:56'
     },
     {
         id: 2,
@@ -22,7 +33,7 @@ const candidates = [
         academicLevel: '1 bac',
         imageUrl:
             'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-        appliedDatetime: '2020-07-01T15:34:56',
+        appliedDatetime: '2020-07-01T15:34:56'
     },
     {
         id: 3,
@@ -30,7 +41,7 @@ const candidates = [
         academicLevel: '1 bac',
         imageUrl:
             'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-        appliedDatetime: '2020-07-01T15:34:56',
+        appliedDatetime: '2020-07-01T15:34:56'
     },
     {
         id: 4,
@@ -38,73 +49,196 @@ const candidates = [
         academicLevel: '1 bac',
         imageUrl:
             'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-        appliedDatetime: '2020-07-01T15:34:56',
+        appliedDatetime: '2020-07-01T15:34:56'
     }
 ];
 
 export default function LessonCard({ lesson }: any) {
+    const subscriptionsCount = lesson.subscriptionsCount;
+    const commentsCount = lesson.commentsCount;
+    const isSubscribed = lesson.isSubscribed;
+    lesson = lesson.lesson;
+
+    const filledStars = Math.round(4);
+    const totalStars = 5;
+    const isLongText = lesson.description.length > 150;
+
     const [isExpanded, setIsExpanded] = useState(false);
     const [openModal, setOpenModal] = useState(false);
+    const [show, setShow] = useState(false);
+    const [alert, setAlert] = useState({ title: '', message: '', type: '' });
+
+    const dispatch = useAppDispatch();
+    const { data: session, status } = useSession();
+    const lessons: any = useSelector((state: RootState) => state.lesson.lessons);
+
+    const subscribers: any = useSelector((state: RootState) => state.lessonSubscription.subscribers);
+    const loading: any = useSelector((state: RootState) => state.lessonSubscription.loading);
+    const error: any = useSelector((state: RootState) => state.lessonSubscription.error);
 
     // Function to toggle the expanded state
     const toggleExpand = () => {
         setIsExpanded(!isExpanded);
     };
 
-    const isLongText = lesson.description.length > 150;
+    const subscribeToLessonHandler = async (lessonId: string) => {
+        if (session?.user?.roles?.includes('ROLE_STUDENT')) {
+            let isSubscribed = lessons.content?.find((item: any) => item.lesson.id == lessonId && item.isSubscribed == true);
+            if (!isSubscribed) {
+                const result: any = await dispatch(
+                    subscribeToLesson({
+                        lessonId,
+                        studentId: session?.user.id
+                    })
+                );
+                if (subscribeToLesson.fulfilled.match(result)) {
+                    await dispatch(SET_LESSON_SUBSCRIBED(lessonId));
+                    setShow(true);
+                    setAlert({
+                        title: 'Subscribed successfully !',
+                        message: 'you have Subscribed to the Lesson successfully !',
+                        type: 'success'
+                    });
+                } else {
+                    setShow(true);
+                    setAlert({
+                        title: 'All fields are required',
+                        message: 'You must enter as student to subscribe to this lesson !',
+                        type: 'error'
+                    });
+                }
+            } else {
+                const result: any = await dispatch(
+                    unsubscribeToLesson({
+                        lessonId,
+                        studentId: session?.user.id
+                    })
+                );
+                if (unsubscribeToLesson.fulfilled.match(result)) {
+                    await dispatch(SET_LESSON_UNSUBSCRIBED(lessonId));
+                    setShow(true);
+                    setAlert({
+                        title: 'UnSubscribed successfully !',
+                        message: 'you have UnSubscribed to the Lesson successfully !',
+                        type: 'success'
+                    });
+                } else {
+                    setShow(true);
+                    setAlert({
+                        title: 'All fields are required',
+                        message: 'You must enter as student to subscribe to this lesson !',
+                        type: 'error'
+                    });
+                }
+            }
+        }
+    };
 
+    const getSubscribers = (lessonId: string) => {
+        setOpenModal(true);
+        const result = dispatch(getLessonSubscribers({ lessonId }));
+    };
     return (
-        <div className="max-w-3xl border p-4 rounded-lg mx-auto my-2">
-            <div className="flex">
-                <img src={lesson.teacher.image} alt="" className="w-16 h-16 rounded-full" />
-                <div className="p-2">
-                    <Link href={'/dashboard/profile'}>
-                        <strong>Said Ait Driss</strong>
-                    </Link>
-                    <div className="text-xs text-gray-500">Data Analyst</div>
-                    <div className="text-xs text-gray-500">4 d</div>
+        <div className="max-w-3xl border border-gray-200  p-3 rounded-lg mx-auto my-4 bg-white">
+            <div className="flex flex-row justify-between items-start">
+                <div className="flex items-center">
+                    <div>
+                        {lesson.teacher.image ? (
+                            <img
+                                src={lesson.teacher.image}
+                                className="w-16 h-16 rounded-full border-2 border-gray-300 shadow-sm outline outline-2 outline-indigo-400"
+                                alt={`${lesson.teacher.firstName} ${lesson.teacher.lastName}`}
+                            />
+                        ) : (
+                            <span className="inline-block h-16 w-16 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-300 shadow-sm outline outline-2 outline-indigo-400">
+                                <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                            </span>
+                        )}
+                        <p className="text-sm text-gray-600 flex items-center justify-center">
+                            {[...Array(totalStars)].map((_, index) => (
+                                <StarIcon key={index} className={`size-3 ${index < filledStars ? 'text-yellow-400' : ''}`} />
+                            ))}
+                        </p>
+                    </div>
+                    <div className="ml-2 mb-5">
+                        <Link href={'/dashboard/profile?id=' + lesson.teacher.id}>
+                            <strong className="text-lg text-gray-800 hover:text-gray-600 transition duration-200">
+                                {lesson.teacher.firstName} {lesson.teacher.lastName}
+                            </strong>
+                        </Link>
+                        <div className="text-xs text-gray-500">{lesson.teacher.academicSpecialist ?? 'Unknown'}</div>
+                        <div className="text-xs text-gray-500">{new Date(lesson.createdAt).toLocaleDateString()}</div>
+                    </div>
+                </div>
+                <div className="self-start">
+                    {new Date(lesson.date).getTime() < new Date().getTime() ? (
+                        <span className="flex items-center space-x-2 p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition duration-200">
+                            <FaRegClock className="text-xl" />
+                            <span className="font-semibold text-sm">Ended</span>
+                        </span>
+                    ) : (
+                        <span className="flex items-center space-x-2 p-2 rounded-lg bg-green-100 text-green-600 hover:bg-green-200 transition duration-200">
+                            <FaRegCalendarAlt className="text-xl" />
+                            <span className="font-semibold text-sm">
+                                {new Date(lesson.date).toLocaleDateString()} - {lesson.starTime}
+                            </span>
+                        </span>
+                    )}
                 </div>
             </div>
-            <div className="text-sm my-2">
-                <Link href={'/dashboard/lessondetails?lessinId=' + lesson.id}>
+
+            <div className="text-sm my-4">
+                <Link href={'/dashboard/lessondetails?lessonId=' + lesson.id} className="text-gray-800 hover:text-gray-600 transition duration-200">
                     {isExpanded ? lesson.description : `${lesson.description.substring(0, 150)}${isLongText ? '...' : ''}`}
                 </Link>
                 {isLongText && (
-                    <button onClick={toggleExpand} className="text-gray-400">
+                    <button onClick={toggleExpand} className="text-gray-400 hover:text-gray-600 transition duration-200">
                         {isExpanded ? ' Read Less' : 'Read More'}
                     </button>
                 )}
             </div>
 
             <div className="flex text-sm text-gray-500 justify-between">
-                <button className="" onClick={() => setOpenModal(true)}>
-                    600 subscribers
+                <button className="hover:text-gray-600 transition duration-200" onClick={() => getSubscribers(lesson.id)}>
+                    {subscriptionsCount} subscribers
                 </button>
-                <span>Remote</span>
-                <span className="text-red-600">Ended</span>
+                <span className="flex items-center space-x-4">
+                    {lesson.lessonType.type.toLowerCase() === 'remote' ? (
+                        <CgRemote className="text-xl" />
+                    ) : (
+                        <HiOutlineLocationMarker className="text-xl" />
+                    )}
+                    <span>{lesson.lessonType.type.toLowerCase()}</span>
+                </span>
             </div>
-            <div className="flex space-x-4 p-4">
-                <button className="flex items-center pe-4 border-e">
-                    <BellAlertIcon className="size-5 text-gray-600 me-2" />
-                    <span className="text-gray-600">Subscribe</span>
-                </button>
-                <Link  href={'/dashboard/lessondetails?lessinId=' + lesson.id}>
-                    <span className="flex items-center pe-4 border-e">
-                        <BiComment className="size-5 text-gray-600 me-2" />
-                        <span className="text-gray-600">13K</span>
-                    </span>
+
+            <div className="flex space-x-4 p-2 items-center border-t border-gray-200 mt-4">
+                {session?.user.roles.includes('ROLE_STUDENT') ? (
+                    <button onClick={() => subscribeToLessonHandler(lesson.id)} className="flex items-center pe-4 transition duration-200">
+                        <BellAlertIcon className={`size-5 me-2 ${isSubscribed ? 'text-primary' : 'text-gray-600'}`} />
+                        <span className={isSubscribed ? 'text-primary' : 'text-gray-600'}>{isSubscribed ? 'Subscribed' : 'Subscribe'}</span>
+                    </button>
+                ) : (
+                    ''
+                )}
+
+                <Link href={'/dashboard/lessondetails?lessonId=' + lesson.id} className="flex items-centerpe-4 border-etransition duration-200">
+                    <BiComment className="size-5 text-gray-600 me-1" />
+                    <span className="text-gray-600 text-sm">{commentsCount}</span>
                 </Link>
-                <button className="flex space-x-2 items-center">
+                <button className="flex items-center transition duration-200">
                     <ShareIcon className="size-5 text-gray-600 me-2" />
                     <span className="text-gray-600">Share</span>
                 </button>
             </div>
 
-            {/* subscribers modal */}
+            {/* Subscribers Modal */}
             <Transition.Root show={openModal} as={Fragment}>
                 <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" open={openModal} onClose={() => setOpenModal(false)}>
+                    <DialogBackdrop className="fixed inset-0 bg-black/30" />
                     <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        {/* This element is to trick the browser into centering the modal contents. */}
                         <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
                             &#8203;
                         </span>
@@ -122,51 +256,28 @@ export default function LessonCard({ lesson }: any) {
                                     <XMarkIcon className="size-5 text-gray-600 me-1" />
                                 </button>
                                 <div>
-                                    <p className='text-center text-gray-400 text-sm'> list of students applied to the lesson.</p>
-                                    <ul role="list" className="mt-5 border-t border-gray-200 divide-y divide-gray-200 sm:mt-0 sm:border-t-0">
-                                        {candidates.map((candidate) => (
-                                            <li key={candidate.id}>
-                                                <Link href="/dashboard/profile" className="group block">
-                                                    <div className="flex items-center py-3 px-4 sm:py-4 sm:px-0">
-                                                        <div className="min-w-0 flex-1 flex items-center">
-                                                            <div className="flex-shrink-0">
-                                                                <img
-                                                                    className="h-12 w-12 rounded-full group-hover:opacity-75"
-                                                                    src={candidate.imageUrl}
-                                                                    alt=""
-                                                                />
-                                                            </div>
-                                                            <div className="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4">
-                                                                <div>
-                                                                    <p className="text-sm font-medium text-purple-600 truncate">{candidate.name}</p>
-                                                                    <p className="mt-1 flex items-center text-sm text-gray-500">
-                                                                        <BiWorld
-                                                                            className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                                                            aria-hidden="true"
-                                                                        />
-                                                                        <span className="truncate">{candidate.academicLevel}</span>
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <ChevronRightIcon
-                                                                className="h-5 w-5 text-gray-400 group-hover:text-gray-700"
-                                                                aria-hidden="true"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    <button className='text-sm text-gray-400 py-2 mx-auto'>Show more</button>
+                                    <p className="text-center text-gray-400 text-sm">List of students applied to the lesson.</p>
+                                    {loading ? (
+                                        'loading'
+                                    ) : (
+                                        <>
+                                            <ul role="list" className="mt-5 border-t border-gray-200 divide-y divide-gray-200 sm:mt-0 sm:border-t-0">
+                                                {subscribers.map((item: any) => (
+                                                    <LessonSubscriber item={item} />
+                                                ))}
+                                            </ul>
+                                            <button className="text-sm text-gray-400 py-2 mx-auto hover:text-gray-600 transition duration-200">
+                                                Show more
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </Transition.Child>
                     </div>
                 </Dialog>
             </Transition.Root>
+            <Notification type={alert.type} title={alert.title} message={alert.message} show={show} setShow={setShow} />
         </div>
     );
 }

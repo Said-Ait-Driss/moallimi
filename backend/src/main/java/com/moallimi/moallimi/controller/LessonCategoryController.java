@@ -3,6 +3,7 @@ package com.moallimi.moallimi.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,9 +16,9 @@ import com.moallimi.moallimi.service.LessonCategoryService;
 
 @RestController
 @ResponseBody
-@RequestMapping("/lesson-category")
-// @CrossOrigin(origins= {"http://localhost:3000"})
-public class LessonCategoryController extends BaseController{
+@RequestMapping("/api/lesson-category")
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials = "true")
+public class LessonCategoryController{
 
     @Autowired
     private LessonCategoryService lessonCategoryService;

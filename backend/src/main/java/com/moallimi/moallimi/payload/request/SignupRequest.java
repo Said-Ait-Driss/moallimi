@@ -1,14 +1,22 @@
 package com.moallimi.moallimi.payload.request;
 
-import java.util.Set;
-
 import jakarta.validation.constraints.*;
  
 public class SignupRequest {
     @NotBlank
     @Size(min = 3, max = 20)
     private String username;
- 
+    
+    @NotBlank
+    @Size(max = 50)
+    private String firstName;
+
+
+    @NotBlank
+    @Size(max = 50)
+    private String lastName;
+
+
     @NotBlank
     @Size(max = 50)
     @Email
@@ -26,6 +34,19 @@ public class SignupRequest {
  
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getFirstName(){
+        return firstName;
+    }
+    public void setFirstName(String firstName){
+        this.firstName = firstName;
+    }
+    public String getLastName(){
+        return lastName;
+    }
+    public void setLastName(String lastName){
+        this.lastName = lastName;
     }
  
     public String getEmail() {

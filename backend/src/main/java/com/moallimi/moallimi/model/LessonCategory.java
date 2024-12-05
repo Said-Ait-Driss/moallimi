@@ -20,7 +20,7 @@ public class LessonCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LessonCategories lessonCategories;
+    private LessonCategories lessonCategory;
 
     private Boolean isDeleted = false;
 

@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -21,17 +22,16 @@ public class LessonSubscriptions {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     private Student student;
 
-    @OneToOne
+    @ManyToOne
     private Lesson lesson;
 
     private AttendenceTypes status;
 
     private String absenceReason;
 
-    private String studentComment;
     private float studentRating;
 
     private Boolean isDeleted = false;

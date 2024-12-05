@@ -1,19 +1,25 @@
 package com.moallimi.moallimi.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moallimi.moallimi.model.Lesson;
+import com.moallimi.moallimi.payload.dto.LessonWithSubscriptionsDTO;
 import com.moallimi.moallimi.service.LessonService;
 
 @RestController
-@RequestMapping("/lesson")
-public class LessonController extends BaseController{
+@RequestMapping("/api/lesson")
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials = "true")
+public class LessonController {
 
     @Autowired
     private LessonService lessonService;
@@ -21,6 +27,20 @@ public class LessonController extends BaseController{
     @PostMapping("/add")
     public Lesson addLesson(@RequestBody Lesson lesson) {
         return lessonService.addLesson(lesson);
+    }
+
+    @GetMapping("/all/{page}/{size}/{studentId}")
+    public Page<LessonWithSubscriptionsDTO> getAllLessons(@PathVariable("page") int page,
+            @PathVariable("size") int size, @RequestParam(value = "recent", defaultValue = "true") Boolean recent,
+            @RequestParam(value = "face_to_face", defaultValue = "false") Boolean faceToFace,
+            @RequestParam(value = "remote", defaultValue = "false") Boolean remote,
+            @PathVariable("studentId") Long studentId) {
+        return lessonService.getAllLessons(page, size, recent, faceToFace, remote, studentId);
+    }
+
+    @GetMapping("/{id}/{studentId}")
+    public LessonWithSubscriptionsDTO getLesson(@PathVariable("id") Long id, @PathVariable("studentId") Long studentId) {
+        return lessonService.getLesson(id, studentId);
     }
 
     @PutMapping("/cancel/{lessonId}")

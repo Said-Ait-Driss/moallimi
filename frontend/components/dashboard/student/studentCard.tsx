@@ -1,18 +1,40 @@
+import { MapPinIcon } from '@heroicons/react/24/solid';
+import Link from 'next/link';
+
 export default function StudentCard({ student }: any) {
     return (
-        <div
-            role="button"
-            className="text-slate-800 flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100"
-        >
-            <div className="mr-4 grid place-items-center">
-                <img alt="candice" src={student.image} className="relative inline-block h-12 w-12 !rounded-full  object-cover object-center" />
-            </div>
-            <div>
-                <h6 className="text-slate-800 font-medium">{student.name}</h6>
-                <p className="text-slate-500 text-sm"> {student.academicLevel} Student </p>
-            </div>
-            <div className="ml-auto">
-                <span className="text-sm"> Engaged in {student.nbreOfEngagedClasses} </span>
+        <div key={student.id} className="group relative p-2 m-2 shadow border-gray-200 sm:p-3 max-w-md">
+            <Link href={`/dashboard/profile?id=${student.id}`}>
+                <div className="relative bg-gray-200 aspect-w-1 aspect-h-1 group-hover:opacity-75 text-center w-full h-24">
+                    {student.image ? (
+                        <img
+                            src={student.image}
+                            className="absolute -bottom-8 inset-x-0 w-20 h-20 rounded-full mx-auto outline outline-2 outline-primary"
+                            alt={student.firstName + ' ' + student.lastName}
+                        />
+                    ) : (
+                        <span className="absolute -bottom-8 inset-x-0 inline-block h-20 w-20 rounded-full overflow-hidden bg-gray-100 mx-auto outline outline-2 outline-primary">
+                            <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </span>
+                    )}
+                </div>
+            </Link>
+            <div className="pt-10 pb-4 text-center">
+                <h3 className="text-xl font-bold text-gray-900">
+                    <Link href={`/dashboard/profile`}>{student.firstName + ' ' + student.lastName}</Link>
+                </h3>
+                <div>
+                    <p className="text-gray-600 text-xs">{new Date(student.createdAt.toString()).toDateString()}</p>
+                    <p className="text-gray-600 text-xs">{student.academicLevel || 'unknown'}</p>
+                </div>
+                <p className="text-sm text-gray-600 flex items-center justify-center my-2">{student.gender}</p>
+                <div className="mt-3 flex justify-center items-center gap-1">
+                    <MapPinIcon className="size-4" />
+                    <p className="mt-1 text-xs text-gray-500">{student.city ?? 'unknown'}</p>
+                </div>
+                <p className="mt-4 text-base font-medium text-gray-900">{student.academicLevel}</p>
             </div>
         </div>
     );

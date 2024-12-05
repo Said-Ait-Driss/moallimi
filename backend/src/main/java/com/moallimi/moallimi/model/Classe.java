@@ -18,11 +18,16 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "admins")
+@Table(name = "classes")
 public class Classe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String title;
+
+    private String image;
+
 
     @OneToOne
     private AcademicLevel academicLevel;
