@@ -11,5 +11,6 @@ export interface Teacher{
 export interface TeacherState {
     teachers: Teacher[];
     loading: boolean;
+    totalElements:number;
     error: string | null;
 }

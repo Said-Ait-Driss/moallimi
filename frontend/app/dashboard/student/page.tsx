@@ -11,6 +11,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CgClose } from 'react-icons/cg';
 import { useSelector } from 'react-redux';
+import Pagination from '@/components/dashboard/shared/pagination';
 
 const filters = [
     { id: 1, name: 'classes' },
@@ -37,6 +38,8 @@ export default function Student() {
     const dispatch = useAppDispatch();
     const loading = useSelector((state: RootState) => state.student.loading);
     const students: any = useSelector((state: RootState) => state.student.students);
+    const totalElements: number | string = useSelector((state: RootState) => state.student.totalElements);
+
     const error = useSelector((state: RootState) => state.student.error);
 
     useEffect(() => {
@@ -56,6 +59,21 @@ export default function Student() {
         const result = await dispatch(studentsList({ page, size, query: query, filter: selectedFilter.id.toString() }));
         if (studentsList.fulfilled.match(result)) {
             router.replace(newUrl);
+        }
+    };
+
+    const onPageChange = async (_page: any) => {
+        try {
+            const new_searchParams = new URLSearchParams(window.location.search);
+            new_searchParams.set('page', _page.toString());
+
+            const result = await dispatch(studentsList({ page: _page, size, filter, query }));
+            if (studentsList.fulfilled.match(result)) {
+                const newUrl = `${window.location.pathname}?${new_searchParams.toString()}`;
+                router.replace(newUrl);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
     };
 
@@ -92,6 +110,7 @@ export default function Student() {
                     {error ? <ErrorAlert title="service not available right now" message="something wrong went happened please try later ." /> : ''}
                     {loading && !error ? 'loading' : students.content?.map((student: any) => <StudentCard student={student} />)}
                 </div>
+                <Pagination currentPage={page} totalResults={totalElements} resultsPerPage={size} onPageChange={onPageChange} />
             </div>
             <div className="col-span-3">
                 <div className="flex items-center justify-center border rounded bg-lightPrimary max-w-72">

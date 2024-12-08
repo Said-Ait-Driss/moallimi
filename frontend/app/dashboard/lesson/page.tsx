@@ -19,6 +19,7 @@ import { RootState } from '@/store/redux';
 import ErrorAlert from '@/components/shared/errorAlert';
 import { SET_LESSONS } from '@/store/features/lesson/lessonSlice';
 import { useSession } from 'next-auth/react';
+import Pagination from '@/components/dashboard/shared/pagination';
 
 const trendingLessons = [
     {
@@ -57,13 +58,14 @@ function classNames(...classes: any) {
 
 export default function Lessons() {
     const [inforOpen, setInfoOpen] = useState(true);
+
     const [tabs, setTabs] = useState(filtertabs);
     const dispatch = useAppDispatch();
     const router = useRouter();
     const { data: session, status } = useSession();
 
     const searchParams = useSearchParams();
-    const page = searchParams.get('page') || 0;
+    const page: any = searchParams.get('page') || 0;
     const size = searchParams.get('size') || 10;
     const recent = searchParams.get('recent') || 'true';
     const face_to_face = searchParams.get('face_to_face') || 'false';
@@ -71,14 +73,15 @@ export default function Lessons() {
 
     const lessons: any = useSelector((state: RootState) => state.lesson.lessons);
     const loading: any = useSelector((state: RootState) => state.lesson.loading);
+    const totalElements: number | string = useSelector((state: RootState) => state.lesson.totalElements);
     const error: any = useSelector((state: RootState) => state.lesson.error);
 
     let studentId = session?.user.roles?.includes('ROLE_STUDENT') ? session?.user.id : -1;
 
     useEffect(() => {
         dispatch(SET_LESSONS([]));
-        const result = dispatch(lessonsList({ page, size, recent, face_to_face, remote, studentId }));
-        const result1 = dispatch(classesList());
+        const result = dispatch(lessonsList({ page: page, size, recent, face_to_face, remote, studentId }));
+        const result1 = dispatch(classesList({ page: 0, size: 100, filter: '', query: '' }));
         const result2 = dispatch(lessonCategoriesList());
         const result3 = dispatch(lessonDurationsList());
         return () => {
@@ -89,15 +92,30 @@ export default function Lessons() {
         };
     }, []);
 
-    const getLessonsByTab = (id: string) => {
+    const getLessonsByTab = async (id: string) => {
         const new_searchParams = new URLSearchParams(window.location.search);
         new_searchParams.set(id, 'true');
         tabs.forEach((item) => {
             if (item.id != id) new_searchParams.set(item.id, 'false');
         });
         const newUrl = `${window.location.pathname}?${new_searchParams.toString()}`;
-        const result = dispatch(lessonsList({ page, size, recent, face_to_face, remote, studentId }));
+        const result = await dispatch(lessonsList({ page, size, recent, face_to_face, remote, studentId }));
         router.replace(newUrl);
+    };
+
+    const onPageChange = async (_page: any) => {
+        try {
+            const new_searchParams = new URLSearchParams(window.location.search);
+            new_searchParams.set('page', _page.toString());
+
+            const result = await dispatch(lessonsList({ page: _page , size, recent, face_to_face, remote, studentId }));
+            if (lessonsList.fulfilled.match(result)) {
+                const newUrl = `${window.location.pathname}?${new_searchParams.toString()}`;
+                router.replace(newUrl);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     };
 
     return (
@@ -115,8 +133,7 @@ export default function Lessons() {
                         </button>
                     </div>
                 )}
-
-                <NewLesson />
+                {session?.user?.roles?.includes('ROLE_TEACHER') ? <NewLesson /> : ''}
                 <div className="max-w-3xl flex w-full items-center rounded-full mx-auto">
                     <div className="flex-1 border-b border-gray-300"></div>
                     <span className="text-black text-md font-semibold leading-8 px-8 py-3">Feed</span>
@@ -164,7 +181,11 @@ export default function Lessons() {
                     </button>
                 </nav>
                 {error ? <ErrorAlert title="service not available right now" message="Something wrong went happened please try later ." /> : ''}
-                {loading ? 'loading' :  lessons?.content?.map((lesson: any) => <LessonCard key={lesson?.lesson?.id} lessonProp={lesson} />)}
+                {lessons?.content?.length > 0
+                    ? lessons?.content?.map((lesson: any) => <LessonCard key={lesson?.lesson?.id} lessonProp={lesson} />)
+                    : 'No Lesson found'}
+                {loading && 'loading'}
+                <Pagination currentPage={page} totalResults={totalElements} resultsPerPage={size} onPageChange={onPageChange} />
             </div>
             <div className="col-span-3">
                 <div className="flex items-center justify-center border rounded bg-lightPrimary max-w-72">
@@ -194,7 +215,7 @@ export default function Lessons() {
                                 <ul role="list" className="-my-4 divide-y divide-gray-200">
                                     {trendingLessons.map((post) => (
                                         <Link href={'/dashboard/lessondetails?lessinId=' + post.id} key={post.id}>
-                                            <li  className="flex py-4 space-x-3">
+                                            <li className="flex py-4 space-x-3">
                                                 <div className="flex-shrink-0">
                                                     <img className="h-8 w-8 rounded-full" src={post.user.imageUrl} alt={post.user.name} />
                                                 </div>

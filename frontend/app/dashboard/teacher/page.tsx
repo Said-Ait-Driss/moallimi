@@ -10,6 +10,7 @@ import { CgClose } from 'react-icons/cg';
 import { useSelector } from 'react-redux';
 import Filter from '@/components/dashboard/shared/filter';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Pagination from '@/components/dashboard/shared/pagination';
 
 const filters = [
     { id: 1, name: 'profession' },
@@ -26,6 +27,8 @@ export default function Teacher() {
     const dispatch = useAppDispatch();
     const loading = useSelector((state: RootState) => state.teacher.loading);
     const teachers: any = useSelector((state: RootState) => state.teacher.teachers);
+    const totalElements: number | string = useSelector((state: RootState) => state.teacher.totalElements);
+
     const error = useSelector((state: RootState) => state.teacher.error);
 
     const searchParams = useSearchParams();
@@ -53,6 +56,21 @@ export default function Teacher() {
         const result = await dispatch(teachersList({ page, size, query: query, filter: selectedFilter.id.toString() }));
         if (teachersList.fulfilled.match(result)) {
             router.replace(newUrl);
+        }
+    };
+
+    const onPageChange = async (_page: any) => {
+        try {
+            const new_searchParams = new URLSearchParams(window.location.search);
+            new_searchParams.set('page', _page.toString());
+
+            const result = await dispatch(teachersList({ page: _page, size, query: query, filter: selectedFilter.id.toString() }));
+            if (teachersList.fulfilled.match(result)) {
+                const newUrl = `${window.location.pathname}?${new_searchParams.toString()}`;
+                router.replace(newUrl);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
     };
 
@@ -94,6 +112,7 @@ export default function Teacher() {
                               <TeacherCard teacher={item.teacher} reviews={item.reviews} key={item.teacher?.id} />
                           )) || null}
                 </div>
+                <Pagination currentPage={page} totalResults={totalElements} resultsPerPage={size} onPageChange={onPageChange} />
             </section>
             <div className="col-span-3">
                 <div className="flex items-center justify-center border rounded bg-lightPrimary max-w-72">

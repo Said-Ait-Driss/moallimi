@@ -6,6 +6,7 @@ import { teachersList } from './teacherAction';
 const initialState: TeacherState = {
     teachers: [],
     loading: false,
+    totalElements:0,
     error: null
 };
 
@@ -26,6 +27,7 @@ const teacherSlice = createSlice({
             .addCase(teachersList.fulfilled, (state, action: PayloadAction<any>) => {
                 state.loading = false;
                 state.teachers = action.payload;
+                state.totalElements = action.payload.totalElements
             })
             .addCase(teachersList.rejected, (state, action: any) => {
                 state.loading = false;

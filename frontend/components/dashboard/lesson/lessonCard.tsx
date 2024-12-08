@@ -4,7 +4,7 @@ import { ShareIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 import { BellAlertIcon, StarIcon } from '@heroicons/react/24/solid';
 import { BiComment } from 'react-icons/bi';
-import { Fragment, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Dialog, DialogBackdrop, Transition } from '@headlessui/react';
 import { CgRemote } from 'react-icons/cg';
 import {  FaRegCalendarAlt, FaRegClock } from 'react-icons/fa';
@@ -18,7 +18,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/redux';
 import LessonSubscriber from './lessonSubscriber';
 
-export default function LessonCard({ lessonProp }: any) {
+ function LessonCard({ lessonProp }: any) {
     const subscriptionsCount = lessonProp.subscriptionsCount;
     const commentsCount = lessonProp.commentsCount;
     const isSubscribed = lessonProp.isSubscribed;
@@ -140,13 +140,13 @@ export default function LessonCard({ lessonProp }: any) {
                 <div className="self-start">
                     {lesson.date && new Date(lesson.date).getTime() < new Date().getTime() ? (
                         <span className="flex items-center space-x-2 p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition duration-200">
-                            <FaRegClock className="text-xl" />
-                            <span className="font-semibold text-sm">Ended</span>
+                            <FaRegClock className="text-md" />
+                            <span className="font-medium text-sm">Ended</span>
                         </span>
                     ) : (
                         <span className="flex items-center space-x-2 p-2 rounded-lg bg-green-100 text-green-600 hover:bg-green-200 transition duration-200">
-                            <FaRegCalendarAlt className="text-xl" />
-                            <span className="font-semibold text-sm">
+                            <FaRegCalendarAlt className="text-md" />
+                            <span className="font-medium text-sm">
                                 {lesson.date ? `${new Date(lesson.date).toLocaleDateString()} - ${lesson.starTime }`: ""}
                             </span>
                         </span>
@@ -169,14 +169,9 @@ export default function LessonCard({ lessonProp }: any) {
                 <button className="hover:text-gray-600 transition duration-200" onClick={() => getSubscribers(lesson.id)}>
                     {subscriptionsCount} subscribers
                 </button>
-                <span className="flex items-center space-x-4">
-                    {lesson.lessonType.type.toLowerCase() === 'remote' ? (
-                        <CgRemote className="text-xl" />
-                    ) : (
-                        <HiOutlineLocationMarker className="text-xl" />
-                    )}
-                    <span>{lesson.lessonType.type.toLowerCase()}</span>
-                </span>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800"> {lesson.classe?.title?.toUpperCase()} </span>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800"> {lesson.lessonCategory?.lessonCategory} </span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"> {lesson.lessonType.type} </span>
             </div>
 
             <div className="flex space-x-4 p-2 items-center border-t border-gray-200 mt-4">
@@ -246,3 +241,5 @@ export default function LessonCard({ lessonProp }: any) {
         </div>
     );
 }
+
+export default React.memo(LessonCard)

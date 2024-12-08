@@ -11,5 +11,6 @@ export interface Student{
 export interface StudentState {
     students: Student[];
     loading: boolean;
+    totalElements:number;
     error: string | null;
 }

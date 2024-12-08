@@ -11,6 +11,8 @@ const initialState: LessonState = {
         subscriptionsCount: 0
     },
     lessons: [],
+    totalPages: {},
+    totalElements: 0,
     loading: false,
     error: null
 };
@@ -21,6 +23,9 @@ const lessonSlice = createSlice({
     reducers: {
         SET_LESSONS(state, action) {
             state.lessons = action.payload;
+        },
+        ADD_LESSON_TO_LIST(state, action) {
+            state.lessons.content.unshift(action.payload);
         },
         SET_LESSON_SUBSCRIBED(state, action) {
             state.lessons.content = state.lessons?.content?.map((lesson: any) => {
@@ -57,6 +62,8 @@ const lessonSlice = createSlice({
             })
             .addCase(lessonsList.fulfilled, (state, action: PayloadAction<any>) => {
                 state.loading = false;
+                state.totalPages = action.payload?.totalPages;
+                state.totalElements = action.payload?.totalElements;
                 state.lessons = action.payload;
             })
             .addCase(lessonsList.rejected, (state, action: any) => {
@@ -83,6 +90,8 @@ const lessonSlice = createSlice({
             })
             .addCase(myLessonsList.fulfilled, (state, action) => {
                 state.loading = false;
+                state.totalPages = action.payload?.totalPages;
+                state.totalElements = action.payload?.totalElements;
                 state.lessons = action.payload;
             })
             .addCase(myLessonsList.rejected, (state, action: any) => {
@@ -105,8 +114,14 @@ const lessonSlice = createSlice({
     }
 });
 
-export const { SET_LESSONS, SET_LESSON_SUBSCRIBED, SET_LESSON_UNSUBSCRIBED, SET_LESSON_DETAILS_SUBSCRIBED, SET_LESSON_DETAILS_UNSUBSCRIBED } =
-    lessonSlice.actions;
+export const {
+    SET_LESSONS,
+    SET_LESSON_SUBSCRIBED,
+    SET_LESSON_UNSUBSCRIBED,
+    SET_LESSON_DETAILS_SUBSCRIBED,
+    SET_LESSON_DETAILS_UNSUBSCRIBED,
+    ADD_LESSON_TO_LIST
+} = lessonSlice.actions;
 export const selectTeachers = (state: RootState) => state.lesson.lessons;
 
 export default lessonSlice.reducer;

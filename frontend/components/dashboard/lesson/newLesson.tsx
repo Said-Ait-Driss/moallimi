@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import { useAppDispatch } from '@/hooks/appHooks';
 import { createLesson, lessonsList } from '@/store/features/lesson/lessonAction';
 import { useSession } from 'next-auth/react';
+import { ADD_LESSON_TO_LIST } from '@/store/features/lesson/lessonSlice';
 
 function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ');
@@ -48,28 +49,26 @@ export default function NewLesson() {
                 id: session?.user.id,
                 email: session?.user.email
             };
-
-            const result: any = await dispatch(
-                createLesson({
-                    title: lessonDescription,
-                    description: lessonDescription,
-                    teacher: teacher,
-                    lessonCategory: selectedCategory,
-                    classe: selectedClasse,
-                    lessonType: selectedLessonDuration,
-                    starTime: lessonDate,
-                    date: lessonDate
-                })
-            );
+            const lessonToCreate = {
+                title: lessonDescription,
+                description: lessonDescription,
+                teacher: teacher,
+                lessonCategory: selectedCategory,
+                classe: selectedClasse,
+                lessonType: selectedLessonDuration,
+                starTime: lessonDate,
+                date: lessonDate
+            };
+            const result: any = await dispatch(createLesson(lessonToCreate));
             if (createLesson.fulfilled.match(result)) {
                 setShowSuccess(true);
-                setLessonDescription("");
+                setLessonDescription('');
                 setSelectedCategory(null);
                 setSelectedClasse(null);
                 setSelectedLessonDuration(null);
                 setLessonDate(null);
                 setOpen(false);
-                const result = dispatch(lessonsList({ page: 0, size: 10 }));
+                const result = dispatch(ADD_LESSON_TO_LIST({ lesson: lessonToCreate }));
             } else {
                 console.log('here ');
                 console.log(result.payload);
@@ -154,9 +153,9 @@ export default function NewLesson() {
 
                                                         {loading
                                                             ? 'loading'
-                                                            : classes.length > 0 && (
+                                                            : classes?.content?.length > 0 && (
                                                                   <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                                                      {classes.map((classe: any) => (
+                                                                      {classes?.content?.map((classe: any) => (
                                                                           <Combobox.Option
                                                                               key={classe?.id}
                                                                               value={classe}
