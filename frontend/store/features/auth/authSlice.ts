@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '@/store/redux';
-import { registerUser } from './authAction';
-import { AuthState, UserData } from './authInterface';
+import { registerUser, updatePassword } from './authAction';
+import { AuthState, PasswordData, UserData } from './authInterface';
 
 const initialState: AuthState = {
     role: 'student',
@@ -52,6 +52,19 @@ const authSlice = createSlice({
                 state.successMessage = 'Registered successfully';
             })
             .addCase(registerUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
+        builder
+            .addCase(updatePassword.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updatePassword.fulfilled, (state, action: PayloadAction<PasswordData>) => {
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(updatePassword.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

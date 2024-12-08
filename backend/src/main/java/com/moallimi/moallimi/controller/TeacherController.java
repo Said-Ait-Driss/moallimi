@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -19,19 +20,21 @@ import com.moallimi.moallimi.service.TeacherService;
 
 @RestController
 @RequestMapping("/api/teacher")
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials="true", allowedHeaders = "*",methods = RequestMethod.GET)
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials = "true", allowedHeaders = "*", methods = RequestMethod.GET)
 public class TeacherController {
-    
+
     @Autowired
     private TeacherService teacherService;
 
     @PutMapping("/update")
-    public Teacher updateTeacher(@RequestBody Teacher teacher){
+    public Teacher updateTeacher(@RequestBody Teacher teacher) {
         return teacherService.updateTeacher(teacher);
     }
-    
+
     @GetMapping("/all/{page}/{size}")
-    public Page<TeachersWithReviewsDTO> getAllTeachers(@PathVariable("page") int page, @PathVariable("size") int size){
-        return teacherService.getAllTeachers(page, size);
+    public Page<TeachersWithReviewsDTO> getAllTeachers(@PathVariable("page") int page, @PathVariable("size") int size,
+            @RequestParam(value = "filter", defaultValue = "-1") int filter,
+            @RequestParam(value = "query", defaultValue = "") String query) {
+        return teacherService.getAllTeachers(page, size, filter, query);
     }
 }

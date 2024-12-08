@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.moallimi.moallimi.model.Lesson;
 import com.moallimi.moallimi.model.LessonSubscriptions;
 import com.moallimi.moallimi.payload.response.LessonSubscriptionsWithoutLessonDTO;
 
@@ -43,4 +44,7 @@ public interface LessonSubscriptionsRepository extends JpaRepository<LessonSubsc
         public LessonSubscriptions deleteByStudentIdAndLessonId(Long studentId, Long lessonId);
 
         public List<LessonSubscriptions> findByLessonId(Long lessonId);
+
+        public Page<LessonSubscriptions> findByStudentId(Long studentId, Pageable pageable);
+
 }

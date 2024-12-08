@@ -1,37 +1,142 @@
-import { Fragment, useState } from 'react';
+'use client';
+
+import { Fragment, useEffect, useState } from 'react';
 import { Dialog, DialogBackdrop, DialogTitle, Switch, Transition } from '@headlessui/react';
+import { useAppDispatch } from '@/hooks/appHooks';
+import { updateUserInfo } from '@/store/features/profile/profileAction';
+import Notification from '@/components/shared/Notification';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/redux';
+import { academicLevelList } from '@/store/features/academicLevel/academicLevelAction';
+import ErrorAlert from '@/components/shared/errorAlert';
 
 function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ');
 }
 
 const GeneralSettings = ({ profile }: any) => {
+    const dispatch = useAppDispatch();
+
     const [automaticTimezoneEnabled, setAutomaticTimezoneEnabled] = useState(true);
     const [autoUpdateApplicantDataEnabled, setAutoUpdateApplicantDataEnabled] = useState(false);
     const [openFirstName, setOpenFirstName] = useState(false);
-    const [firstName, setFirstName] = useState('');
+    const [firstName, setFirstName] = useState(profile.user.firstName);
 
     const [openLastName, setOpenLastName] = useState(false);
-    const [lastName, setLastName] = useState('');
+    const [lastName, setLastName] = useState(profile.user.lastName);
 
-    const [openEmail, setOpenEmail] = useState(false);
-    const [email, setEmail] = useState('');
+    const [openAbout, setOpenAbout] = useState(false);
+    const [about, setAbout] = useState(profile.user.about);
 
-    const [openAcademicLevel, setOpenAcademicLevel] = useState(false);
-    const [academicLevel, setAcademicLevel] = useState('');
+    const [openCity, setOpenCity] = useState(false);
+    const [city, setCity] = useState(profile.user.city);
+
+    const [openPhoneNumber, setOpenPhoneNumber] = useState(false);
+    const [phoneNumber, setPhoneNumber] = useState(profile.user.phoneNumber);
+
+    const [openAddress, setOpenAddress] = useState(false);
+    const [address, setAddress] = useState(profile.user.address);
 
     const [openProfession, setOpenProfession] = useState(false);
-    const [profession, setProfession] = useState('');
+    const [profession, setProfession] = useState(profile.user.profession);
 
-    const onUpdateFirstName = () => {};
-    const onUpdateLastName = () => {};
-    const onUpdateEmail = () => {};
-    const onUpdateAcademicLevel = () => {};
-    const onUpdateProfession = () => {};
+    const [openBirthDate, setOpenBirthDate] = useState(false);
+    const [birthDate, setBirthDate] = useState(profile.user.birthDate);
+
+    const [show, setShow] = useState(false);
+    const [alert, setAlert] = useState({ title: '', message: '', type: '' });
+
+    const loading: any = useSelector((state: RootState) => state.profile.loading);
+    const error: any = useSelector((state: RootState) => state.profile.error);
+
+    useEffect(() => {
+        const result1 = dispatch(academicLevelList());
+        return () => {
+            result1.abort();
+        };
+    }, []);
+
+    const onUpdateFirstName = () => {
+        if (!firstName) {
+            return;
+        }
+        setOpenFirstName(false);
+    };
+    const onUpdateLastName = () => {
+        if (!lastName) {
+            return;
+        }
+        setOpenLastName(false);
+    };
+    const onUpdateAbout = () => {
+        if (!about) {
+            return;
+        }
+        setOpenAbout(false);
+    };
+    const onUpdatePhoneNumber = () => {
+        if (!phoneNumber) {
+            return;
+        }
+        setOpenPhoneNumber(false);
+    };
+    const onUpdateBirthDate = () => {
+        if (!birthDate) {
+            return;
+        }
+        setOpenBirthDate(false);
+    };
+    const onUpdateCity = () => {
+        if (!city) {
+            return;
+        }
+        setOpenCity(false);
+    };
+    const onUpdateAddress = () => {
+        if (!address) {
+            return;
+        }
+        setOpenAddress(false);
+    };
+    const onUpdateProfession = () => {
+        if (!profession) {
+            return;
+        }
+        setOpenProfession(false);
+    };
+
+    const onUpdateAll = async (e: any) => {
+        e.preventDefault();
+        const newUser = { ...profile.user, firstName, lastName, city, profession, address, phoneNumber, birthDate, about };
+
+        delete newUser.createdAt;
+        delete newUser.password;
+        delete newUser.classes;
+        delete newUser.username;
+        delete newUser.email;
+
+        const result = await dispatch(updateUserInfo(newUser));
+        if (updateUserInfo.fulfilled.match(result)) {
+            setShow(true);
+            setAlert({
+                title: 'Updated successfully !',
+                message: 'you have Updated your first name successfully !',
+                type: 'success'
+            });
+        } else {
+            setShow(true);
+            setAlert({
+                title: 'An Error occured !',
+                message: 'An Error Occured please try again later or contact support for help !',
+                type: 'error'
+            });
+        }
+    };
     return (
         <>
             {/* Description list with inline editing */}
             <div className="mt-10 divide-y divide-gray-200">
+                {error && <ErrorAlert title="error occur" message="An Error occur" />}
                 <div className="space-y-1">
                     <h3 className="text-lg leading-6 font-medium text-primary">Profile</h3>
                     <p className="max-w-2xl text-sm text-gray-500">This information will be displayed publicly so be careful what you share.</p>
@@ -41,7 +146,7 @@ const GeneralSettings = ({ profile }: any) => {
                         <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
                             <dt className="text-sm font-medium text-gray-500">First Name</dt>
                             <dd className="mt-1 flex text-sm text-primary sm:mt-0 sm:col-span-2">
-                                <span className="flex-grow">{profile.user?.firstName}</span>
+                                <span className="flex-grow">{firstName}</span>
                                 <span className="ml-4 flex-shrink-0">
                                     <button
                                         type="button"
@@ -56,11 +161,26 @@ const GeneralSettings = ({ profile }: any) => {
                         <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
                             <dt className="text-sm font-medium text-gray-500">Last Name</dt>
                             <dd className="mt-1 flex text-sm text-primary sm:mt-0 sm:col-span-2">
-                                <span className="flex-grow">{profile.user?.lastName}</span>
+                                <span className="flex-grow">{lastName}</span>
                                 <span className="ml-4 flex-shrink-0">
                                     <button
                                         type="button"
                                         onClick={() => setOpenLastName(true)}
+                                        className="bg-white rounded-md font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                    >
+                                        Update
+                                    </button>
+                                </span>
+                            </dd>
+                        </div>
+                        <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
+                            <dt className="text-sm font-medium text-gray-500">About</dt>
+                            <dd className="mt-1 flex text-sm text-primary sm:mt-0 sm:col-span-2">
+                                <span className="flex-grow">{about}</span>
+                                <span className="ml-4 flex-shrink-0">
+                                    <button
+                                        type="button"
+                                        onClick={() => setOpenAbout(true)}
                                         className="bg-white rounded-md font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                                     >
                                         Update
@@ -104,13 +224,13 @@ const GeneralSettings = ({ profile }: any) => {
                             </dd>
                         </div>
                         <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:pt-5">
-                            <dt className="text-sm font-medium text-gray-500">Email</dt>
+                            <dt className="text-sm font-medium text-gray-500">Phone Number</dt>
                             <dd className="mt-1 flex text-sm text-primary sm:mt-0 sm:col-span-2">
-                                <span className="flex-grow">{profile.user?.email}</span>
+                                <span className="flex-grow">{phoneNumber || 'UnKnown'}</span>
                                 <span className="ml-4 flex-shrink-0">
                                     <button
                                         type="button"
-                                        onClick={() => setOpenEmail(true)}
+                                        onClick={() => setOpenPhoneNumber(true)}
                                         className="bg-white rounded-md font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                                     >
                                         Update
@@ -118,15 +238,44 @@ const GeneralSettings = ({ profile }: any) => {
                                 </span>
                             </dd>
                         </div>
-
+                        <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:pt-5">
+                            <dt className="text-sm font-medium text-gray-500">City</dt>
+                            <dd className="mt-1 flex text-sm text-primary sm:mt-0 sm:col-span-2">
+                                <span className="flex-grow">{city || 'UnKnown'}</span>
+                                <span className="ml-4 flex-shrink-0">
+                                    <button
+                                        type="button"
+                                        onClick={() => setOpenCity(true)}
+                                        className="bg-white rounded-md font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                    >
+                                        Update
+                                    </button>
+                                </span>
+                            </dd>
+                        </div>
+                        <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:pt-5">
+                            <dt className="text-sm font-medium text-gray-500">Birth Date</dt>
+                            <dd className="mt-1 flex text-sm text-primary sm:mt-0 sm:col-span-2">
+                                <span className="flex-grow">{(birthDate && new Date(birthDate).toDateString()) || 'UnKnown'}</span>
+                                <span className="ml-4 flex-shrink-0">
+                                    <button
+                                        type="button"
+                                        onClick={() => setOpenBirthDate(true)}
+                                        className="bg-white rounded-md font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                    >
+                                        Update
+                                    </button>
+                                </span>
+                            </dd>
+                        </div>
                         <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:border-b sm:border-gray-200">
-                            <dt className="text-sm font-medium text-gray-500">Academic Level</dt>
+                            <dt className="text-sm font-medium text-gray-500">Address</dt>
                             <dd className="mt-1 flex text-sm text-primary sm:mt-0 sm:col-span-2">
-                                <span className="flex-grow">{profile.user?.AcademicLevel || 'UnKnown'}</span>
+                                <span className="flex-grow">{address || 'UnKnown'}</span>
                                 <span className="ml-4 flex-shrink-0">
                                     <button
                                         type="button"
-                                        onClick={() => setOpenAcademicLevel(true)}
+                                        onClick={() => setOpenAddress(true)}
                                         className="bg-white rounded-md font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                                     >
                                         Update
@@ -134,25 +283,21 @@ const GeneralSettings = ({ profile }: any) => {
                                 </span>
                             </dd>
                         </div>
-                        {profile.user?.roles?.[0].name == 'ROLE_STUDENT' ? (
-                            <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:border-b sm:border-gray-200">
-                                <dt className="text-sm font-medium text-gray-500">Profession</dt>
-                                <dd className="mt-1 flex text-sm text-primary sm:mt-0 sm:col-span-2">
-                                    <span className="flex-grow">{profile.user?.profession || 'UnKnown'}</span>
-                                    <span className="ml-4 flex-shrink-0">
-                                        <button
-                                            type="button"
-                                            onClick={()=>setOpenAcademicLevel(true)}
-                                            className="bg-white rounded-md font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                                        >
-                                            Update
-                                        </button>
-                                    </span>
-                                </dd>
-                            </div>
-                        ) : (
-                            ''
-                        )}
+                        <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:border-b sm:border-gray-200">
+                            <dt className="text-sm font-medium text-gray-500">Profession</dt>
+                            <dd className="mt-1 flex text-sm text-primary sm:mt-0 sm:col-span-2">
+                                <span className="flex-grow">{profession || 'UnKnown'}</span>
+                                <span className="ml-4 flex-shrink-0">
+                                    <button
+                                        type="button"
+                                        onClick={() => setOpenProfession(true)}
+                                        className="bg-white rounded-md font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                    >
+                                        Update
+                                    </button>
+                                </span>
+                            </dd>
+                        </div>
                     </dl>
                 </div>
             </div>
@@ -174,29 +319,6 @@ const GeneralSettings = ({ profile }: any) => {
                                         className="bg-white rounded-md font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                                     >
                                         Update
-                                    </button>
-                                </span>
-                            </dd>
-                        </div>
-                        <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:pt-5">
-                            <dt className="text-sm font-medium text-gray-500">Date format</dt>
-                            <dd className="mt-1 flex text-sm text-primary sm:mt-0 sm:col-span-2">
-                                <span className="flex-grow">DD-MM-YYYY</span>
-                                <span className="ml-4 flex-shrink-0 flex items-start space-x-4">
-                                    <button
-                                        type="button"
-                                        className="bg-white rounded-md font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                                    >
-                                        Update
-                                    </button>
-                                    <span className="text-gray-300" aria-hidden="true">
-                                        |
-                                    </span>
-                                    <button
-                                        type="button"
-                                        className="bg-white rounded-md font-medium text-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                                    >
-                                        Remove
                                     </button>
                                 </span>
                             </dd>
@@ -250,7 +372,20 @@ const GeneralSettings = ({ profile }: any) => {
                     </dl>
                 </div>
             </div>
-
+            <div className="w-full my-4">
+                <button
+                    onClick={onUpdateAll}
+                    type="button"
+                    disabled={loading}
+                    className="float-start inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-darkPrimary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:col-start-2 sm:text-sm"
+                >
+                    <span className="me-1">{loading ? 'Updating ...' : ' Update '}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" id="send" fill="#fff">
+                        <path fill="none" d="M0 0h24v24H0V0z"></path>
+                        <path d="M3.4 20.4l17.45-7.48c.81-.35.81-1.49 0-1.84L3.4 3.6c-.66-.29-1.39.2-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z"></path>
+                    </svg>
+                </button>
+            </div>
             {/* update first name modal */}
             <Transition.Root show={openFirstName} as={Fragment}>
                 <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10" onClose={() => setOpenFirstName(false)}>
@@ -295,13 +430,10 @@ const GeneralSettings = ({ profile }: any) => {
                                         <button
                                             onClick={onUpdateFirstName}
                                             type="button"
+                                            disabled={loading}
                                             className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-darkPrimary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:col-start-2 sm:text-sm"
                                         >
-                                            Update{' '}
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" id="send" fill="#fff">
-                                                <path fill="none" d="M0 0h24v24H0V0z"></path>
-                                                <path d="M3.4 20.4l17.45-7.48c.81-.35.81-1.49 0-1.84L3.4 3.6c-.66-.29-1.39.2-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z"></path>
-                                            </svg>
+                                            {loading ? 'Updating ...' : 'Done '}
                                         </button>
                                         <button
                                             type="button"
@@ -362,13 +494,10 @@ const GeneralSettings = ({ profile }: any) => {
                                         <button
                                             onClick={onUpdateLastName}
                                             type="button"
+                                            disabled={loading}
                                             className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-darkPrimary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:col-start-2 sm:text-sm"
                                         >
-                                            Update{' '}
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" id="send" fill="#fff">
-                                                <path fill="none" d="M0 0h24v24H0V0z"></path>
-                                                <path d="M3.4 20.4l17.45-7.48c.81-.35.81-1.49 0-1.84L3.4 3.6c-.66-.29-1.39.2-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z"></path>
-                                            </svg>
+                                            {loading ? 'Updating ...' : 'Done '}
                                         </button>
                                         <button
                                             type="button"
@@ -385,9 +514,9 @@ const GeneralSettings = ({ profile }: any) => {
                 </Dialog>
             </Transition.Root>
 
-            {/* update email modal */}
-            <Transition.Root show={openEmail} as={Fragment}>
-                <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10" onClose={() => setOpenFirstName(false)}>
+            {/* update last name modal */}
+            <Transition.Root show={openAbout} as={Fragment}>
+                <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10" onClose={() => setOpenAbout(false)}>
                     <DialogBackdrop className="fixed inset-0 bg-black/30" />
                     <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                         <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
@@ -406,41 +535,38 @@ const GeneralSettings = ({ profile }: any) => {
                                 <div>
                                     <div className="mt-3 text-center sm:mt-5">
                                         <DialogTitle as="h3" className="text-lg leading-6 font-medium text-gray-900">
-                                            Update Email
+                                            Update About
                                         </DialogTitle>
                                         <div className="mt-2">
                                             <div className="mb-6">
                                                 <label htmlFor="fileAttachment" className="block text-gray-700 text-sm font-bold mb-2 text-start">
-                                                    Email :
+                                                    About :
                                                 </label>
                                                 <input
-                                                    id="email"
-                                                    name="email"
-                                                    value={email}
-                                                    onChange={(e) => setLastName(e.target.value)}
+                                                    id="about"
+                                                    name="about"
+                                                    value={about}
+                                                    onChange={(e) => setAbout(e.target.value)}
                                                     className="w-full border border-gray-300 rounded-md px-4 py-2 leading-5 transition duration-150 ease-in-out sm:text-sm
                     sm:leading-5 resize-none focus:outline-none focus:border-darkPrimary hover:border-darkPrimary"
-                                                    placeholder="Your New Email !"
+                                                    placeholder="Your New About !"
                                                 ></input>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                                         <button
-                                            onClick={onUpdateEmail}
+                                            onClick={onUpdateAbout}
                                             type="button"
+                                            disabled={loading}
                                             className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-darkPrimary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:col-start-2 sm:text-sm"
                                         >
-                                            Update{' '}
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" id="send" fill="#fff">
-                                                <path fill="none" d="M0 0h24v24H0V0z"></path>
-                                                <path d="M3.4 20.4l17.45-7.48c.81-.35.81-1.49 0-1.84L3.4 3.6c-.66-.29-1.39.2-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z"></path>
-                                            </svg>
+                                            {loading ? 'Updating ...' : 'Done '}
                                         </button>
                                         <button
                                             type="button"
                                             className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:mt-0 sm:col-start-1 sm:text-sm"
-                                            onClick={() => setOpenEmail(false)}
+                                            onClick={() => setOpenAbout(false)}
                                         >
                                             Cancel
                                         </button>
@@ -452,9 +578,9 @@ const GeneralSettings = ({ profile }: any) => {
                 </Dialog>
             </Transition.Root>
 
-            {/* update AcademicLevel modal */}
-            <Transition.Root show={openAcademicLevel} as={Fragment}>
-                <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10" onClose={() => setOpenAcademicLevel(false)}>
+            {/* update Phone Number modal */}
+            <Transition.Root show={openPhoneNumber} as={Fragment}>
+                <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10" onClose={() => setOpenPhoneNumber(false)}>
                     <DialogBackdrop className="fixed inset-0 bg-black/30" />
                     <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                         <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
@@ -473,18 +599,21 @@ const GeneralSettings = ({ profile }: any) => {
                                 <div>
                                     <div className="mt-3 text-center sm:mt-5">
                                         <DialogTitle as="h3" className="text-lg leading-6 font-medium text-gray-900">
-                                            Update Academic Level
+                                            Update Phone Number
                                         </DialogTitle>
                                         <div className="mt-2">
                                             <div className="mb-6">
                                                 <label htmlFor="fileAttachment" className="block text-gray-700 text-sm font-bold mb-2 text-start">
-                                                    Email :
+                                                    Profession :
                                                 </label>
                                                 <input
-                                                    id="AcademicLevel"
-                                                    name="AcademicLevel"
-                                                    value={academicLevel}
-                                                    onChange={(e) => setAcademicLevel(e.target.value)}
+                                                    id="phoneNumber"
+                                                    name="phoneNumber"
+                                                    value={phoneNumber}
+                                                    type="number"
+                                                    max={10}
+                                                    min={10}
+                                                    onChange={(e) => setPhoneNumber(e.target.value)}
                                                     className="w-full border border-gray-300 rounded-md px-4 py-2 leading-5 transition duration-150 ease-in-out sm:text-sm
                     sm:leading-5 resize-none focus:outline-none focus:border-darkPrimary hover:border-darkPrimary"
                                                     placeholder="Your New Academic Level !"
@@ -494,20 +623,212 @@ const GeneralSettings = ({ profile }: any) => {
                                     </div>
                                     <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                                         <button
-                                            onClick={onUpdateAcademicLevel}
+                                            onClick={onUpdatePhoneNumber}
                                             type="button"
+                                            disabled={loading}
                                             className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-darkPrimary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:col-start-2 sm:text-sm"
                                         >
-                                            Update{' '}
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" id="send" fill="#fff">
-                                                <path fill="none" d="M0 0h24v24H0V0z"></path>
-                                                <path d="M3.4 20.4l17.45-7.48c.81-.35.81-1.49 0-1.84L3.4 3.6c-.66-.29-1.39.2-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z"></path>
-                                            </svg>
+                                            {loading ? 'Updating ...' : 'Done'}
                                         </button>
                                         <button
                                             type="button"
                                             className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:mt-0 sm:col-start-1 sm:text-sm"
-                                            onClick={() => setOpenAcademicLevel(false)}
+                                            onClick={() => setOpenPhoneNumber(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </Transition.Child>
+                    </div>
+                </Dialog>
+            </Transition.Root>
+
+            {/* update city modal */}
+            <Transition.Root show={openCity} as={Fragment}>
+                <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10" onClose={() => setOpenCity(false)}>
+                    <DialogBackdrop className="fixed inset-0 bg-black/30" />
+                    <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+                            &#8203;
+                        </span>
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            enterTo="opacity-100 translate-y-0 sm:scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        >
+                            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                                <div>
+                                    <div className="mt-3 text-center sm:mt-5">
+                                        <DialogTitle as="h3" className="text-lg leading-6 font-medium text-gray-900">
+                                            Update City
+                                        </DialogTitle>
+                                        <div className="mt-2">
+                                            <div className="mb-6">
+                                                <label htmlFor="fileAttachment" className="block text-gray-700 text-sm font-bold mb-2 text-start">
+                                                    City :
+                                                </label>
+                                                <input
+                                                    id="city"
+                                                    name="city"
+                                                    value={city}
+                                                    onChange={(e) => setCity(e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-md px-4 py-2 leading-5 transition duration-150 ease-in-out sm:text-sm
+                    sm:leading-5 resize-none focus:outline-none focus:border-darkPrimary hover:border-darkPrimary"
+                                                    placeholder="Your New City !"
+                                                ></input>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                                        <button
+                                            onClick={onUpdateCity}
+                                            type="button"
+                                            disabled={loading}
+                                            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-darkPrimary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:col-start-2 sm:text-sm"
+                                        >
+                                            {loading ? 'Updating ...' : 'Done '}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:mt-0 sm:col-start-1 sm:text-sm"
+                                            onClick={() => setOpenCity(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </Transition.Child>
+                    </div>
+                </Dialog>
+            </Transition.Root>
+
+            {/* update birthDate modal */}
+            <Transition.Root show={openBirthDate} as={Fragment}>
+                <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10" onClose={() => setOpenBirthDate(false)}>
+                    <DialogBackdrop className="fixed inset-0 bg-black/30" />
+                    <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+                            &#8203;
+                        </span>
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            enterTo="opacity-100 translate-y-0 sm:scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        >
+                            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                                <div>
+                                    <div className="mt-3 text-center sm:mt-5">
+                                        <DialogTitle as="h3" className="text-lg leading-6 font-medium text-gray-900">
+                                            Update Birth Date
+                                        </DialogTitle>
+                                        <div className="mt-2">
+                                            <div className="mb-6">
+                                                <label htmlFor="fileAttachment" className="block text-gray-700 text-sm font-bold mb-2 text-start">
+                                                    City :
+                                                </label>
+                                                <input
+                                                    id="birthDate"
+                                                    name="birthDate"
+                                                    value={birthDate}
+                                                    type="date"
+                                                    onChange={(e) => setBirthDate(e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-md px-4 py-2 leading-5 transition duration-150 ease-in-out sm:text-sm
+                    sm:leading-5 resize-none focus:outline-none focus:border-darkPrimary hover:border-darkPrimary"
+                                                    placeholder="Your New Birth Date !"
+                                                ></input>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                                        <button
+                                            onClick={onUpdateBirthDate}
+                                            type="button"
+                                            disabled={loading}
+                                            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-darkPrimary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:col-start-2 sm:text-sm"
+                                        >
+                                            {loading ? 'Updating ...' : 'Done '}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:mt-0 sm:col-start-1 sm:text-sm"
+                                            onClick={() => setOpenBirthDate(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </Transition.Child>
+                    </div>
+                </Dialog>
+            </Transition.Root>
+
+            {/* update Address modal */}
+            <Transition.Root show={openAddress} as={Fragment}>
+                <Dialog as="div" className="fixed inset-0 overflow-y-auto z-10" onClose={() => setOpenAddress(false)}>
+                    <DialogBackdrop className="fixed inset-0 bg-black/30" />
+                    <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+                            &#8203;
+                        </span>
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            enterTo="opacity-100 translate-y-0 sm:scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        >
+                            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                                <div>
+                                    <div className="mt-3 text-center sm:mt-5">
+                                        <DialogTitle as="h3" className="text-lg leading-6 font-medium text-gray-900">
+                                            Update Address
+                                        </DialogTitle>
+                                        <div className="mt-2">
+                                            <div className="mt-2">
+                                                <div className="mb-6">
+                                                    <label htmlFor="fileAttachment" className="block text-gray-700 text-sm font-bold mb-2 text-start">
+                                                        Address :
+                                                    </label>
+                                                    <input
+                                                        id="address"
+                                                        name="address"
+                                                        value={address}
+                                                        onChange={(e) => setAddress(e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-md px-4 py-2 leading-5 transition duration-150 ease-in-out sm:text-sm
+                    sm:leading-5 resize-none focus:outline-none focus:border-darkPrimary hover:border-darkPrimary"
+                                                        placeholder="Your New Address !"
+                                                    ></input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                                        <button
+                                            onClick={onUpdateAddress}
+                                            type="button"
+                                            disabled={loading}
+                                            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-darkPrimary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:col-start-2 sm:text-sm"
+                                        >
+                                            {loading ? 'Updating ...' : 'Done '}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:mt-0 sm:col-start-1 sm:text-sm"
+                                            onClick={() => setOpenAddress(false)}
                                         >
                                             Cancel
                                         </button>
@@ -545,7 +866,7 @@ const GeneralSettings = ({ profile }: any) => {
                                         <div className="mt-2">
                                             <div className="mb-6">
                                                 <label htmlFor="fileAttachment" className="block text-gray-700 text-sm font-bold mb-2 text-start">
-                                                    Email :
+                                                    Profession :
                                                 </label>
                                                 <input
                                                     id="Profession"
@@ -554,7 +875,7 @@ const GeneralSettings = ({ profile }: any) => {
                                                     onChange={(e) => setProfession(e.target.value)}
                                                     className="w-full border border-gray-300 rounded-md px-4 py-2 leading-5 transition duration-150 ease-in-out sm:text-sm
                     sm:leading-5 resize-none focus:outline-none focus:border-darkPrimary hover:border-darkPrimary"
-                                                    placeholder="Your New Academic Level !"
+                                                    placeholder="Your New Profession !"
                                                 ></input>
                                             </div>
                                         </div>
@@ -563,13 +884,10 @@ const GeneralSettings = ({ profile }: any) => {
                                         <button
                                             onClick={onUpdateProfession}
                                             type="button"
+                                            disabled={loading}
                                             className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-darkPrimary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkPrimary sm:col-start-2 sm:text-sm"
                                         >
-                                            Update{' '}
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" id="send" fill="#fff">
-                                                <path fill="none" d="M0 0h24v24H0V0z"></path>
-                                                <path d="M3.4 20.4l17.45-7.48c.81-.35.81-1.49 0-1.84L3.4 3.6c-.66-.29-1.39.2-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z"></path>
-                                            </svg>
+                                            {loading ? 'Updating ...' : 'Done'}
                                         </button>
                                         <button
                                             type="button"
@@ -585,6 +903,8 @@ const GeneralSettings = ({ profile }: any) => {
                     </div>
                 </Dialog>
             </Transition.Root>
+
+            <Notification type={alert.type} title={alert.title} message={alert.message} show={show} setShow={setShow} />
         </>
     );
 };

@@ -1,7 +1,7 @@
 import { RootState } from '@/store/redux';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Lesson, LessonState } from './lessonInterface';
-import { createLesson, getLessonDetails, lessonsList } from './lessonAction';
+import { createLesson, getLessonDetails, lessonsList, myLessonsList } from './lessonAction';
 
 const initialState: LessonState = {
     lesson: {
@@ -76,7 +76,19 @@ const lessonSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             });
-
+        builder
+            .addCase(myLessonsList.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(myLessonsList.fulfilled, (state, action) => {
+                state.loading = false;
+                state.lessons = action.payload;
+            })
+            .addCase(myLessonsList.rejected, (state, action: any) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
         builder
             .addCase(getLessonDetails.pending, (state) => {
                 state.loading = true;

@@ -9,6 +9,7 @@ import lessonReducer from '@/store/features/lesson/lessonSlice';
 import profileReducer from '@/store/features/profile/profileSlice';
 import lessonDiscussionReducer from "@/store/features/lessonDiscussion/lessonDiscussionSlice"
 import lessonSubscriptionReducer from "@/store/features/lessonSubscription/lessonSubscriptionSlice"
+import academicLevelReducer from "@/store/features/academicLevel/academicLevelSlice"
 
 import { AuthState } from './features/auth/authInterface';
 import { TeacherState } from './features/teacher/teacherInterface';
@@ -20,6 +21,7 @@ import { LessonState } from './features/lesson/lessonInterface';
 import { ProfileState } from './features/profile/profileInterface';
 import { LessonDiscussionState } from './features/lessonDiscussion/lessonDiscussionInterface';
 import { LessonSubscriptionState } from './features/lessonSubscription/lessonSubscriptionInterface';
+import { academicLevelState } from './features/academicLevel/academicLevelInterface';
 
 export interface RootState {
     auth: AuthState;
@@ -31,7 +33,8 @@ export interface RootState {
     lesson: LessonState;
     profile: ProfileState;
     lessonDiscussion: LessonDiscussionState,
-    lessonSubscription: LessonSubscriptionState
+    lessonSubscription: LessonSubscriptionState,
+    academicLevel: academicLevelState,
 }
 
 export const store = configureStore({
@@ -45,7 +48,8 @@ export const store = configureStore({
         lesson:  lessonReducer,
         profile:  profileReducer,
         lessonDiscussion: lessonDiscussionReducer,
-        lessonSubscription : lessonSubscriptionReducer
+        lessonSubscription : lessonSubscriptionReducer,
+        academicLevel: academicLevelReducer
     }
 });
 export type AppDispatch = typeof store.dispatch;

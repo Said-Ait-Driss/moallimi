@@ -1,7 +1,7 @@
 import { RootState } from '@/store/redux';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ProfileState } from './profileInterface';
-import { profile } from './profileAction';
+import { profile, updateUserInfo } from './profileAction';
 
 const initialState: ProfileState = {
     profile: { id: 0, firstName: '', lastName: '' },
@@ -28,6 +28,19 @@ const profileSlice = createSlice({
                 state.profile = action.payload;
             })
             .addCase(profile.rejected, (state, action: any) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
+
+        builder
+            .addCase(updateUserInfo.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateUserInfo.fulfilled, (state, action: PayloadAction<any>) => {
+                state.loading = false;
+            })
+            .addCase(updateUserInfo.rejected, (state, action: any) => {
                 state.loading = false;
                 state.error = action.payload;
             });

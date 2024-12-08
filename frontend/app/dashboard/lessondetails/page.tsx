@@ -190,7 +190,7 @@ export default function LessonDetails() {
                                             {lessonDetails.lesson.teacher.firstName} {lessonDetails.lesson.teacher.lastName}
                                         </strong>
                                     </Link>
-                                    <div className="text-xs text-gray-500">{lessonDetails.lesson.teacher.academicSpecialist ?? 'Unkown'}</div>
+                                    <div className="text-xs text-gray-500">{lessonDetails.lesson.teacher.academicSpecialist?.name ?? 'Unkown'}</div>
                                     <div className="text-xs text-gray-500">{new Date(lessonDetails.lesson.createdAt).toDateString()}</div>
                                 </div>
                             </div>

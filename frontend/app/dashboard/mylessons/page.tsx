@@ -1,68 +1,51 @@
 'use client';
 
-import TeacherCard from '@/components/dashboard/teacher/teacherCard';
+import LessonCard from '@/components/dashboard/lesson/lessonCard';
 import ErrorAlert from '@/components/shared/errorAlert';
 import { useAppDispatch } from '@/hooks/appHooks';
-import { teachersList } from '@/store/features/teacher/teacherAction';
+import { myLessonsList } from '@/store/features/lesson/lessonAction';
+import { SET_LESSONS } from '@/store/features/lesson/lessonSlice';
 import { RootState } from '@/store/redux';
+import { BellAlertIcon } from '@heroicons/react/24/solid';
+import { useSession } from 'next-auth/react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CgClose } from 'react-icons/cg';
 import { useSelector } from 'react-redux';
-import Filter from '@/components/dashboard/shared/filter';
-import { useRouter, useSearchParams } from 'next/navigation';
 
-const filters = [
-    { id: 1, name: 'profession' },
-    { id: 2, name: 'Academic Level' },
-    { id: 3, name: 'Full Name' },
-    { id: 4, name: 'City' }
-];
-
-export default function Teacher() {
+export default function MyLessons() {
     const [inforOpen, setInfoOpen] = useState(true);
-    const [selectedFilter, setSelectedFilter] = useState(filters[1]);
-    const [query, setQuery] = useState('');
-
+    const router = useRouter();
+    const { data: session, status } = useSession();
     const dispatch = useAppDispatch();
-    const loading = useSelector((state: RootState) => state.teacher.loading);
-    const teachers: any = useSelector((state: RootState) => state.teacher.teachers);
-    const error = useSelector((state: RootState) => state.teacher.error);
 
     const searchParams = useSearchParams();
-    const router = useRouter();
-
     const page = searchParams.get('page') || 0;
     const size = searchParams.get('size') || 10;
-    const sQuery = searchParams.get('query') || '';
-    const filter = searchParams.get('filter') || -1;
+    let studentId = session?.user.roles?.includes('ROLE_STUDENT') ? session?.user.id : -1;
+
+    const lessons: any = useSelector((state: RootState) => state.lesson.lessons);
+    const loading: any = useSelector((state: RootState) => state.lesson.loading);
+    const error: any = useSelector((state: RootState) => state.lesson.error);
 
     useEffect(() => {
-        const result = dispatch(teachersList({ page, size, query: sQuery, filter }));
+        if (studentId < '0') {
+            router.back();
+        }
+        dispatch(SET_LESSONS([]));
+        const result = dispatch(myLessonsList({ page, size, studentId }));
         return () => {
             result.abort();
         };
     }, []);
 
-    const onSubmitHandler = async (e: any) => {
-        e.preventDefault();
-        const new_searchParams = new URLSearchParams(window.location.search);
-        new_searchParams.set('filter', selectedFilter.id.toString());
-        new_searchParams.set('query', query);
-
-        const newUrl = `${window.location.pathname}?${new_searchParams.toString()}`;
-        const result = await dispatch(teachersList({ page, size, query: query, filter: selectedFilter.id.toString() }));
-        if (teachersList.fulfilled.match(result)) {
-            router.replace(newUrl);
-        }
-    };
-
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-6">
             <div className="col-span-1"></div>
-            <section className="col-span-8 overflow-hidden">
+            <div className="col-span-8">
                 {inforOpen && (
                     <div className="text-center py-4 px-4 sm:px-6 lg:px-8 relative">
-                        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">Teachers</h1>
+                        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">My Lessons</h1>
                         <p className="mt-4 max-w-xl mx-auto text-base text-gray-500">
                             The secret to a tidy desk? Don't get rid of anything, just put it in really really nice looking containers.
                         </p>
@@ -71,30 +54,16 @@ export default function Teacher() {
                         </button>
                     </div>
                 )}
-                <Filter
-                    filters={filters}
-                    selected={selectedFilter}
-                    setSelected={setSelectedFilter}
-                    query={query}
-                    setQuery={setQuery}
-                    onSubmitHandler={onSubmitHandler}
-                />
+
                 <div className="max-w-3xl flex w-full items-center rounded-full mx-auto">
                     <div className="flex-1 border-b border-gray-300"></div>
                     <span className="text-black text-md font-semibold leading-8 px-8 py-3">Feed</span>
                     <div className="flex-1 border-b border-gray-300"></div>
                 </div>
-                <div>
-                    {error ? <ErrorAlert title="service not available right now" message="something wrong went happened please try later ." /> : ''}
-                </div>
-                <div className="grid grid-cols-2 sm:mx-0 md:grid-cols-3">
-                    {loading && !error
-                        ? 'loading'
-                        : teachers?.content?.map((item: any) => (
-                              <TeacherCard teacher={item.teacher} reviews={item.reviews} key={item.teacher?.id} />
-                          )) || null}
-                </div>
-            </section>
+
+                {error ? <ErrorAlert title="service not available right now" message="Something wrong went happened please try later ." /> : ''}
+                {loading ? 'loading' : lessons?.content && lessons.content?.map((lesson: any) => <LessonCard key={lesson.lesson.id} lessonProp={lesson} />)}
+            </div>
             <div className="col-span-3">
                 <div className="flex items-center justify-center border rounded bg-lightPrimary max-w-72">
                     <div className="m-4">

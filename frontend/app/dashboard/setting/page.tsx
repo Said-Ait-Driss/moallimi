@@ -11,10 +11,13 @@ import { useAppDispatch } from '@/hooks/appHooks';
 import { profile } from '@/store/features/profile/profileAction';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/redux';
+import { academicLevelList } from '@/store/features/academicLevel/academicLevelAction';
+import AcademicLevelSettings from '@/components/dashboard/setting/AcademicLevelSettings';
 
 const tabs = [
     { name: 'General', href: '#', current: true },
     { name: 'Password', href: '#', current: false },
+    { name: 'Academic Level', href: '#', current: false },
     { name: 'Notifications', href: '#', current: false },
     { name: 'Plan', href: '#', current: false },
     { name: 'Billing', href: '#', current: false }
@@ -26,6 +29,7 @@ function classNames(...classes: any) {
 
 export default function Example() {
     const [selectedOption, setSelectedOption] = useState(tabs[0].name);
+
     const { data: session, status } = useSession();
     const dispatch = useAppDispatch();
 
@@ -33,12 +37,26 @@ export default function Example() {
     const loading: any = useSelector((state: RootState) => state.profile.loading);
     const error: any = useSelector((state: RootState) => state.lesson.error);
 
+    const academicLevels: any = useSelector((state: RootState) => state.academicLevel.academicLevels);
+    const loading2: any = useSelector((state: RootState) => state.academicLevel.loading);
+
     useEffect(() => {
         if (!session?.user.id) {
             signOut({ callbackUrl: '/auth/login', redirect: true });
             return;
         }
         const result = dispatch(profile({ userId: session?.user.id }));
+        return () => {
+            result.abort();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!session?.user.id) {
+            signOut({ callbackUrl: '/auth/login', redirect: true });
+            return;
+        }
+        const result = dispatch(academicLevelList());
         return () => {
             result.abort();
         };
@@ -81,8 +99,20 @@ export default function Example() {
                                         </div>
                                     </div>
                                     <div className="py-6">
-                                        {selectedOption === 'General' && (loading ? 'loading' : <GeneralSettings profile={profileData} />)}
+                                        {selectedOption === 'General' &&
+                                            (loading ? 'loading' : profileData.user ? <GeneralSettings profile={profileData} /> : '')}
                                         {selectedOption === 'Password' && <PasswordSettings />}
+                                        {selectedOption === 'Academic Level' &&
+                                            (loading || loading2 ? (
+                                                'loading'
+                                            ) : profileData.user ? (
+                                                <AcademicLevelSettings
+                                                    userAcademicLevel={profileData.user.academicSpecialist}
+                                                    academicLevels={academicLevels}
+                                                />
+                                            ) : (
+                                                ''
+                                            ))}
                                         {selectedOption === 'Notifications' && <NotificationsSettings />}
                                         {selectedOption === 'Plan' && <PlanSetting />}
                                         {selectedOption === 'Billing' && <BillingSettings />}

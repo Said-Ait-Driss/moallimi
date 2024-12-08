@@ -8,5 +8,4 @@ import lombok.Data;
 @Data
 @DiscriminatorValue("PARENT")
 public class Parent extends User{
-    private String profession;    
 }

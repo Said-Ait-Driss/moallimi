@@ -15,4 +15,12 @@ public class UserService {
     public User getUserProfile(Long userId) {
         return userRepository.findById(userId).orElse(null);
     }
+
+    public User updateUser(User user){
+        return userRepository.saveAndFlush(user);
+    }
+
+    public User getUserById(Long userId){
+        return userRepository.findById(userId).orElse(null);
+    }
 }

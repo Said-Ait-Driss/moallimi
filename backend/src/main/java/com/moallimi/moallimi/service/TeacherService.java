@@ -10,9 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.moallimi.moallimi.model.Review;
 import com.moallimi.moallimi.model.Teacher;
-import com.moallimi.moallimi.model.User;
 import com.moallimi.moallimi.payload.dto.ReviewStatDTO;
 import com.moallimi.moallimi.payload.response.TeachersWithReviewsDTO;
 import com.moallimi.moallimi.repository.ReviewRepository;
@@ -31,10 +29,28 @@ public class TeacherService {
         return this.teacherRepository.save(teahcer);
     }
 
-    public Page<TeachersWithReviewsDTO> getAllTeachers(int page, int size) {
+    public Page<TeachersWithReviewsDTO> getAllTeachers(int page, int size, int filter, String query) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Teacher> teachersPage = this.teacherRepository.findAll(pageable);
+        Page<Teacher> teachersPage;
+
+        switch (filter) {
+            case 1: // Filter by profession
+                teachersPage = this.teacherRepository.findByProfessionContaining(query, pageable);
+                break;
+            case 2: // Filter by academic level
+                teachersPage = this.teacherRepository.findByAcademicLevelContaining(query, pageable);
+                break;
+            case 3: // Filter by full name
+                teachersPage = this.teacherRepository.findByFullNameContaining(query, pageable);
+                break;
+            case 4: // Filter by city
+                teachersPage = this.teacherRepository.findByCityContaining(query, pageable);
+                break;
+            default: // If no valid filter is provided, all students
+                teachersPage = this.teacherRepository.findAll(pageable);
+                break;
+        }
 
         List<TeachersWithReviewsDTO> teacherWithReviewsList = new ArrayList<>();
 

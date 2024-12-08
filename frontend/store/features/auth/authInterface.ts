@@ -15,3 +15,10 @@ export interface UserData {
     password: string;
     role: string;
 }
+
+export interface PasswordData {
+    currentPassword: string;
+    newPassword: string;
+    confirmationPassword: string;
+    userId?: string;
+}

@@ -27,14 +27,14 @@ export default function StudentCard({ student }: any) {
                 </h3>
                 <div>
                     <p className="text-gray-600 text-xs">{new Date(student.createdAt.toString()).toDateString()}</p>
-                    <p className="text-gray-600 text-xs">{student.academicLevel || 'unknown'}</p>
+                    <p className="text-gray-600 text-xs">{student.academicLevel?.name || 'unknown'}</p>
                 </div>
                 <p className="text-sm text-gray-600 flex items-center justify-center my-2">{student.gender}</p>
                 <div className="mt-3 flex justify-center items-center gap-1">
                     <MapPinIcon className="size-4" />
                     <p className="mt-1 text-xs text-gray-500">{student.city ?? 'unknown'}</p>
                 </div>
-                <p className="mt-4 text-base font-medium text-gray-900">{student.academicLevel}</p>
+                <p className="mt-4 text-sm text-gray-900">{student.academicLevel?.name}</p>
             </div>
         </div>
     );

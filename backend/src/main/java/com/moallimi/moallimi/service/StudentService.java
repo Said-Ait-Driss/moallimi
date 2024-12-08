@@ -14,20 +14,37 @@ import com.moallimi.moallimi.repository.StudentRepository;
 
 @Service
 public class StudentService {
-    
+
     @Autowired
     private StudentRepository studentRepository;
 
-    public Student updateStudent(Student student){
+    public Student updateStudent(Student student) {
         return this.studentRepository.save(student);
     }
 
-    public List<Student> getAllStudents(){
+    public Student getStudentById(Long id) {
+        return this.studentRepository.findById(id).orElse(null);
+    }
+
+    public List<Student> getAllStudents() {
         return this.studentRepository.findAll();
     }
 
-    public Page<Student> getAllStudents(int page,int size){
+    public Page<Student> getAllStudents(int page, int size, int filter, String query) {
         Pageable pageable = PageRequest.of(page, size);
-        return this.studentRepository.findAll(pageable);
+        // return this.studentRepository.findAll(pageable);
+        switch (filter) {
+            case 1: // Filter by classes
+                return this.studentRepository.findByClassContaining(query, pageable);
+            case 2: // Filter by academic level
+                return this.studentRepository.findByAcademicLevelContaining(query, pageable);
+            case 3: // Filter by full name
+                return this.studentRepository.findByFullNameContaining(query, pageable);
+            case 4: // Filter by city
+                return this.studentRepository.findByCityContaining(query, pageable);
+            default: // If no valid filter is provided, return all students
+                return this.studentRepository.findAll(pageable);
+        }
     }
+
 }

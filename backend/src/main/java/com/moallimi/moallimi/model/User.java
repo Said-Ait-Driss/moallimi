@@ -48,6 +48,7 @@ public class User {
   private String address;
   private Date birthDate;
   private String image;
+  private String profession;
   private String cover;
   private String city;
   private String about;

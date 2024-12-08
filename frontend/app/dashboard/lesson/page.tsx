@@ -55,7 +55,7 @@ function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ');
 }
 
-export default function Student() {
+export default function Lessons() {
     const [inforOpen, setInfoOpen] = useState(true);
     const [tabs, setTabs] = useState(filtertabs);
     const dispatch = useAppDispatch();
@@ -76,20 +76,16 @@ export default function Student() {
     let studentId = session?.user.roles?.includes('ROLE_STUDENT') ? session?.user.id : -1;
 
     useEffect(() => {
+        dispatch(SET_LESSONS([]));
+        const result = dispatch(lessonsList({ page, size, recent, face_to_face, remote, studentId }));
         const result1 = dispatch(classesList());
         const result2 = dispatch(lessonCategoriesList());
         const result3 = dispatch(lessonDurationsList());
         return () => {
+            result.abort();
             result1.abort();
             result2.abort();
             result3.abort();
-        };
-    }, []);
-    useEffect(() => {
-        dispatch(SET_LESSONS([]));
-        const result = dispatch(lessonsList({ page, size, recent, face_to_face, remote, studentId }));
-        return () => {
-            result.abort();
         };
     }, []);
 
@@ -168,7 +164,7 @@ export default function Student() {
                     </button>
                 </nav>
                 {error ? <ErrorAlert title="service not available right now" message="Something wrong went happened please try later ." /> : ''}
-                {loading ? 'loading' : lessons.content?.map((lesson: any) => <LessonCard key={lesson.lesson.id} lesson={lesson} />)}
+                {loading ? 'loading' :  lessons?.content?.map((lesson: any) => <LessonCard key={lesson?.lesson?.id} lessonProp={lesson} />)}
             </div>
             <div className="col-span-3">
                 <div className="flex items-center justify-center border rounded bg-lightPrimary max-w-72">
@@ -197,8 +193,8 @@ export default function Student() {
                             <div className="mt-6 flow-root">
                                 <ul role="list" className="-my-4 divide-y divide-gray-200">
                                     {trendingLessons.map((post) => (
-                                        <Link href={'/dashboard/lessondetails?lessinId=' + post.id}>
-                                            <li key={post.id} className="flex py-4 space-x-3">
+                                        <Link href={'/dashboard/lessondetails?lessinId=' + post.id} key={post.id}>
+                                            <li  className="flex py-4 space-x-3">
                                                 <div className="flex-shrink-0">
                                                     <img className="h-8 w-8 rounded-full" src={post.user.imageUrl} alt={post.user.name} />
                                                 </div>

@@ -11,4 +11,6 @@ import com.moallimi.moallimi.model.Lesson;
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
     public Optional<Lesson> findByIdAndCreatedAtAfter(Long lessonId, LocalDateTime dateTime);
+
+
 }

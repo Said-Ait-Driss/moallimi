@@ -12,6 +12,17 @@ export const lessonsList = createAsyncThunk('/api/lesson/all', async (pageable: 
     }
 });
 
+export const myLessonsList = createAsyncThunk('/api/lesson/my', async (pageable: any, { rejectWithValue }) => {
+    try {
+        const response: any = await axiosInstance.get(
+            `/api/lesson/my/${pageable.page}/${pageable.size}/${pageable.studentId}`
+        );
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response.data.message);
+    }
+});
+
 export const createLesson = createAsyncThunk('/api/lesson/add', async (data: any, { rejectWithValue }) => {
     try {
         const response: any = await axiosInstance.post('/api/lesson/add', data);

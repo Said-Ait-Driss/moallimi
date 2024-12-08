@@ -8,79 +8,52 @@ import { RootState } from '@/store/redux';
 import { useEffect, useState } from 'react';
 import { CgClose } from 'react-icons/cg';
 import { useSelector } from 'react-redux';
+import Filter from '@/components/dashboard/shared/filter';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-const _classes = [
-    {
-        id: 1,
-        name: 'Organize Basic Set (Walnut)',
-        academicLevel: '1 Bac',
-        studentsCount: 38,
-        imageSrc: 'https://teachingenglishwithoxford.oup.com/wp-content/uploads/2013/12/kids-in-classroom.jpg?w=400',
-        imageAlt: 'TODO',
-        href: '#'
-    },
-    {
-        id: 2,
-        name: 'Organize Pen Holder',
-        academicLevel: '6 primary',
-        studentsCount: 18,
-        imageSrc: 'https://www.saintfrancoislesgoelands.com/wp-content/uploads/2017/05/des-eleves-en-classe-300x200.jpg',
-        imageAlt: 'TODO',
-        href: '#'
-    },
-    {
-        id: 3,
-        name: 'Organize Sticky Note Holder',
-        academicLevel: '1 Bac',
-        studentsCount: 14,
-        imageSrc: 'https://media2.ledevoir.com/images_galerie/nwd_394164_258807/image.jpg?width=828',
-        imageAlt: 'TODO',
-        href: '#'
-    },
-    {
-        id: 4,
-        name: 'Organize Phone Holder',
-        academicLevel: '3 college',
-        studentsCount: 21,
-        imageSrc: 'https://cliparts.co/cliparts/ki8/584/ki8584yAT.jpg',
-        imageAlt: 'TODO',
-        href: '#'
-    },
-    {
-        id: 5,
-        name: 'Organize Phone Holder',
-        academicLevel: '5 eme',
-        studentsCount: 21,
-        imageSrc: 'https://media2.ledevoir.com/images_galerie/nwd_394164_258807/image.jpg?width=828',
-        imageAlt: 'TODO',
-        href: '#'
-    },
-    {
-        id: 6,
-        name: 'Organize Phone Holder',
-        academicLevel: '2 Bac',
-        studentsCount: 21,
-        imageSrc: 'https://cliparts.co/cliparts/ki8/584/ki8584yAT.jpg',
-        imageAlt: 'TODO',
-        href: '#'
-    }
+const filters = [
+    { id: 1, name: 'Academic Level' },
+    { id: 2, name: 'Title' }
 ];
 
 export default function Classe() {
     const [inforOpen, setInfoOpen] = useState(true);
 
     const dispatch = useAppDispatch();
+    const [selectedFilter, setSelectedFilter] = useState(filters[1]);
+    const [query, setQuery] = useState('');
+
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
+    const page = searchParams.get('page') || 0;
+    const size = searchParams.get('size') || 10;
+    const sQuery = searchParams.get('query') || '';
+    const filter = searchParams.get('filter') || -1;
 
     const classes: any = useSelector((state: RootState) => state.classe.classes);
     const loading: any = useSelector((state: RootState) => state.classe.loading);
     const error: any = useSelector((state: RootState) => state.lesson.error);
 
     useEffect(() => {
-        const result = dispatch(classesList());
+        const result = dispatch(classesList({ page, size, query: sQuery, filter }));
         return () => {
             result.abort();
         };
     }, []);
+
+    const onSubmitHandler = async (e: any) => {
+        e.preventDefault();
+        const new_searchParams = new URLSearchParams(window.location.search);
+        new_searchParams.set('filter', selectedFilter.id.toString());
+        new_searchParams.set('query', query);
+
+        const newUrl = `${window.location.pathname}?${new_searchParams.toString()}`;
+        const result = await dispatch(classesList({ page, size, query: query, filter: selectedFilter.id.toString() }));
+        if (classesList.fulfilled.match(result)) {
+            router.replace(newUrl);
+        }
+    };
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-6">
@@ -97,6 +70,14 @@ export default function Classe() {
                         </button>
                     </div>
                 )}
+                <Filter
+                    filters={filters}
+                    selected={selectedFilter}
+                    setSelected={setSelectedFilter}
+                    query={query}
+                    setQuery={setQuery}
+                    onSubmitHandler={onSubmitHandler}
+                />
                 <div className="max-w-3xl flex w-full items-center rounded-full mx-auto">
                     <div className="flex-1 border-b border-gray-300"></div>
                     <span className="text-black text-md font-semibold leading-8 px-8 py-3">Our Classes</span>
@@ -109,7 +90,7 @@ export default function Classe() {
                         'loading'
                     ) : (
                         <div className="-mx-px border-l border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3">
-                            {classes.map((classe: any) => (
+                            {classes.content?.map((classe: any) => (
                                 <ClasseCard key={classe.id} classe={classe} />
                             ))}
                         </div>

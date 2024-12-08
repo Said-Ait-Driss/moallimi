@@ -38,8 +38,15 @@ public class LessonController {
         return lessonService.getAllLessons(page, size, recent, faceToFace, remote, studentId);
     }
 
+    @GetMapping("/my/{page}/{size}/{studentId}")
+    public Page<LessonWithSubscriptionsDTO> getMyLessons(@PathVariable("page") int page, @PathVariable("size") int size,
+            @PathVariable("studentId") Long studentId) {
+        return lessonService.getMyLessons(page, size, studentId);
+    }
+
     @GetMapping("/{id}/{studentId}")
-    public LessonWithSubscriptionsDTO getLesson(@PathVariable("id") Long id, @PathVariable("studentId") Long studentId) {
+    public LessonWithSubscriptionsDTO getLesson(@PathVariable("id") Long id,
+            @PathVariable("studentId") Long studentId) {
         return lessonService.getLesson(id, studentId);
     }
 

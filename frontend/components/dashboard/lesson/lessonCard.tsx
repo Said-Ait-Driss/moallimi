@@ -1,14 +1,14 @@
 'use client';
 
-import { ChevronRightIcon, ShareIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { ShareIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 import { BellAlertIcon, StarIcon } from '@heroicons/react/24/solid';
-import { BiComment, BiWorld } from 'react-icons/bi';
+import { BiComment } from 'react-icons/bi';
 import { Fragment, useState } from 'react';
 import { Dialog, DialogBackdrop, Transition } from '@headlessui/react';
 import { CgRemote } from 'react-icons/cg';
-import { FaLocationArrow, FaRegCalendarAlt, FaRegClock } from 'react-icons/fa';
-import { HiLocationMarker, HiOutlineLocationMarker } from 'react-icons/hi';
+import {  FaRegCalendarAlt, FaRegClock } from 'react-icons/fa';
+import {  HiOutlineLocationMarker } from 'react-icons/hi';
 import { getLessonSubscribers, subscribeToLesson, unsubscribeToLesson } from '@/store/features/lessonSubscription/lessonSubscriptionAction';
 import { useAppDispatch } from '@/hooks/appHooks';
 import { useSession } from 'next-auth/react';
@@ -18,46 +18,11 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/redux';
 import LessonSubscriber from './lessonSubscriber';
 
-const candidates = [
-    {
-        id: 1,
-        name: 'Emily Selman',
-        academicLevel: '1 bac',
-        imageUrl:
-            'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-        appliedDatetime: '2020-07-01T15:34:56'
-    },
-    {
-        id: 2,
-        name: 'Emily Selman',
-        academicLevel: '1 bac',
-        imageUrl:
-            'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-        appliedDatetime: '2020-07-01T15:34:56'
-    },
-    {
-        id: 3,
-        name: 'Emily Selman',
-        academicLevel: '1 bac',
-        imageUrl:
-            'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-        appliedDatetime: '2020-07-01T15:34:56'
-    },
-    {
-        id: 4,
-        name: 'Emily Selman',
-        academicLevel: '1 bac',
-        imageUrl:
-            'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-        appliedDatetime: '2020-07-01T15:34:56'
-    }
-];
-
-export default function LessonCard({ lesson }: any) {
-    const subscriptionsCount = lesson.subscriptionsCount;
-    const commentsCount = lesson.commentsCount;
-    const isSubscribed = lesson.isSubscribed;
-    lesson = lesson.lesson;
+export default function LessonCard({ lessonProp }: any) {
+    const subscriptionsCount = lessonProp.subscriptionsCount;
+    const commentsCount = lessonProp.commentsCount;
+    const isSubscribed = lessonProp.isSubscribed;
+    const lesson = lessonProp.lesson;
 
     const filledStars = Math.round(4);
     const totalStars = 5;
@@ -168,12 +133,12 @@ export default function LessonCard({ lesson }: any) {
                                 {lesson.teacher.firstName} {lesson.teacher.lastName}
                             </strong>
                         </Link>
-                        <div className="text-xs text-gray-500">{lesson.teacher.academicSpecialist ?? 'Unknown'}</div>
+                        <div className="text-xs text-gray-500">{lesson.teacher.academicSpecialist?.name ?? 'Unknown'}</div>
                         <div className="text-xs text-gray-500">{new Date(lesson.createdAt).toLocaleDateString()}</div>
                     </div>
                 </div>
                 <div className="self-start">
-                    {new Date(lesson.date).getTime() < new Date().getTime() ? (
+                    {lesson.date && new Date(lesson.date).getTime() < new Date().getTime() ? (
                         <span className="flex items-center space-x-2 p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition duration-200">
                             <FaRegClock className="text-xl" />
                             <span className="font-semibold text-sm">Ended</span>
@@ -182,7 +147,7 @@ export default function LessonCard({ lesson }: any) {
                         <span className="flex items-center space-x-2 p-2 rounded-lg bg-green-100 text-green-600 hover:bg-green-200 transition duration-200">
                             <FaRegCalendarAlt className="text-xl" />
                             <span className="font-semibold text-sm">
-                                {new Date(lesson.date).toLocaleDateString()} - {lesson.starTime}
+                                {lesson.date ? `${new Date(lesson.date).toLocaleDateString()} - ${lesson.starTime }`: ""}
                             </span>
                         </span>
                     )}

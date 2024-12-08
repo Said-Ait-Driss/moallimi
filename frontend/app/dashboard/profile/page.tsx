@@ -25,7 +25,7 @@ const TabDetails = ({ profileData }: any) => (
                     </div>
                     <div className="flex flex-col py-3">
                         <dt className="mb-1 text-gray-500 md:text-lg ">Date Of Birth</dt>
-                        <dd className="text-lg font-semibold">{profileData.birthDate ?? 'Unknown'}</dd>
+                        <dd className="text-lg font-semibold">{ profileData.birthDate ? new Date(profileData.birthDate).toDateString() : 'Unknown'}</dd>
                     </div>
                     <div className="flex flex-col py-3">
                         <dt className="mb-1 text-gray-500 md:text-lg ">Gender</dt>
@@ -145,19 +145,19 @@ export default function Profile() {
                         />
                     }
 
-                    <div className="sm:w-[80%] xs:w-[90%] mx-auto flex mb-2">
+                    <div className="sm:w-[80%] xs:w-[90%] mx-auto flex mb-2 relative lg:bottom-[3rem] sm:-bottom-[4rem] xs:-bottom-[3rem]">
                         {profileData.user?.image ? (
                             <img
                                 src="/user-cover-2.png"
                                 alt="User Profile"
                                 className={`
                                     ${profileData.user.roles?.[0].name == 'ROLE_STUDENT' ? 'outline-primary' : 'outline-indigo-400'}
-                                    "rounded-full h-20 w-20 outline outline-2 outline-offset-2  relative lg:bottom-[3rem] sm:bottom-[4rem] xs:bottom-[3rem]"
+                                    "rounded-full h-20 w-20 outline outline-2 outline-offset-2  relative"
                                 `}
                             />
                         ) : (
                             <span
-                                className={` ${profileData.user?.roles?.[0].name == 'ROLE_STUDENT' ? 'outline-primary' : 'outline-indigo-400'} rounded-full max-h-20 max-w-20 overflow-hidden bg-gray-100 outline outline-2 outline-offset-2 relative lg:bottom-[3rem] sm:bottom-[4rem] xs:bottom-[3rem]`}
+                                className={` ${profileData.user?.roles?.[0].name == 'ROLE_STUDENT' ? 'outline-primary' : 'outline-indigo-400'} rounded-full max-h-20 max-w-20 overflow-hidden bg-gray-100 outline outline-2 outline-offset-2`}
                             >
                                 <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -168,11 +168,12 @@ export default function Profile() {
                             {loading ? (
                                 'loading'
                             ) : (
-                                <h1 className="w-full text-left xs:pl-4 text-gray-800 lg:text-3xl md:text-3xl sm:text-3xl xs:text-xl font-serif">
+                                <h1 className="w-full text-left xs:pl-4 text-gray-400 lg:text-3xl md:text-3xl sm:text-3xl xs:text-xl font-serif">
                                     {profileData.user?.firstName + ' ' + profileData.user?.lastName}
                                 </h1>
                             )}
-                            {loading ? 'loading' : <div className="text-sm text-gray-500">{profileData.user?.academicLevel ?? 'Unknow'}</div>}
+                            {loading ? 'loading' : <div className="text-sm text-gray-500">{profileData.user?.academicLevel?.name || 'Unknow'}</div>}
+                            {loading ? 'loading' : <div className="text-sm text-gray-500">{profileData.user?.profession || 'Unknow'}</div>}
                         </div>
                         <div className="flex gap-2 w-full justify-end sm:mx-4 my-1">
                             <a href="#">
