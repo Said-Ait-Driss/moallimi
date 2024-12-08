@@ -16,6 +16,15 @@ export interface UserData {
     role: string;
 }
 
+
+
+export interface EmailData {
+    currentEmail: string;
+    newEmail: string;
+    userId?: string;
+    code?: string;
+}
+
 export interface PasswordData {
     currentPassword: string;
     newPassword: string;

@@ -13,10 +13,12 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/redux';
 import { academicLevelList } from '@/store/features/academicLevel/academicLevelAction';
 import AcademicLevelSettings from '@/components/dashboard/setting/AcademicLevelSettings';
+import EmailSetting from '@/components/dashboard/setting/EmailSettings';
 
 const tabs = [
     { name: 'General', href: '#', current: true },
     { name: 'Password', href: '#', current: false },
+    { name: 'Email', href: '#', current: false },
     { name: 'Academic Level', href: '#', current: false },
     { name: 'Notifications', href: '#', current: false },
     { name: 'Plan', href: '#', current: false },
@@ -116,6 +118,7 @@ export default function Example() {
                                         {selectedOption === 'Notifications' && <NotificationsSettings />}
                                         {selectedOption === 'Plan' && <PlanSetting />}
                                         {selectedOption === 'Billing' && <BillingSettings />}
+                                        {selectedOption === 'Email' && <EmailSetting />}
                                     </div>
                                 </div>
                             </div>

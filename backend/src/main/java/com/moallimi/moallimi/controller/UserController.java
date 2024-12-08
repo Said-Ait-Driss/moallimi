@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moallimi.moallimi.enums.EnumRole;
 import com.moallimi.moallimi.model.Admin;
+import com.moallimi.moallimi.model.Email;
 import com.moallimi.moallimi.model.Experience;
 import com.moallimi.moallimi.model.Role;
 import com.moallimi.moallimi.model.Student;
 import com.moallimi.moallimi.model.Teacher;
 import com.moallimi.moallimi.model.User;
+import com.moallimi.moallimi.payload.request.UpdateEmailRequest;
 import com.moallimi.moallimi.payload.request.UpdatePasswordRequest;
 import com.moallimi.moallimi.payload.response.ProfileResponse;
 import com.moallimi.moallimi.service.AdminService;
@@ -127,12 +129,36 @@ public class UserController {
             return ResponseEntity.badRequest().body("Old password is incorrect.");
         }
 
-        if(!request.getNewPassword().equals(request.getConfirmationPassword())){
+        if (!request.getNewPassword().equals(request.getConfirmationPassword())) {
             return ResponseEntity.badRequest().body("Confirmtion password is incorrect.");
         }
 
         user.setPassword(encoder.encode(request.getNewPassword()));
 
         return ResponseEntity.ok(userService.updateUser(user));
+    }
+
+    @PutMapping("/email/send")
+    public ResponseEntity<?> sendCodeToEmail(@RequestBody UpdateEmailRequest request) {
+        User user = userService.getUserById(request.getUserId());
+        if (user == null) {
+            return ResponseEntity.badRequest().body("User not found.");
+        }
+        if (!user.getEmail().equals(request.getCurrentEmail())) {
+            return ResponseEntity.badRequest().body("Current email is incorrect.");
+        }
+        return userService.sendEmailToUser(user);
+    }
+
+    @PutMapping("/email/update")
+    public ResponseEntity<?> updateEmail(@RequestBody UpdateEmailRequest request) {
+        User user = userService.getUserById(request.getUserId());
+        if (user == null) {
+            return ResponseEntity.badRequest().body("User not found.");
+        }
+        if (!user.getEmail().equals(request.getCurrentEmail())) {
+            return ResponseEntity.badRequest().body("Current email is incorrect.");
+        }
+        return userService.updateEmail(user,request);
     }
 }

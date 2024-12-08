@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '@/store/redux';
-import { registerUser, updatePassword } from './authAction';
-import { AuthState, PasswordData, UserData } from './authInterface';
+import { registerUser, sendCodeToEmail, updateEmail, updatePassword } from './authAction';
+import { AuthState, EmailData, PasswordData, UserData } from './authInterface';
 
 const initialState: AuthState = {
     role: 'student',
@@ -65,6 +65,34 @@ const authSlice = createSlice({
                 state.error = null;
             })
             .addCase(updatePassword.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
+
+        builder
+            .addCase(updateEmail.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateEmail.fulfilled, (state, action: PayloadAction<EmailData>) => {
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(updateEmail.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
+
+        builder
+            .addCase(sendCodeToEmail.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(sendCodeToEmail.fulfilled, (state, action: PayloadAction<EmailData>) => {
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(sendCodeToEmail.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

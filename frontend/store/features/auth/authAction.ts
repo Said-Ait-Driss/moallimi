@@ -14,6 +14,13 @@ interface PasswordData {
     userId?: string;
 }
 
+interface EmailData {
+    currentEmail: string;
+    newEmail: string;
+    userId?: string;
+    code?: string;
+}
+
 // actions
 export const registerUser = createAsyncThunk<UserData, UserData>('/api/auth/signup', async (userData, { rejectWithValue }) => {
     try {
@@ -27,6 +34,25 @@ export const registerUser = createAsyncThunk<UserData, UserData>('/api/auth/sign
 export const updatePassword = createAsyncThunk<PasswordData, PasswordData>('/api/user/password/update', async (userData, { rejectWithValue }) => {
     try {
         const response: any = await axiosInstance.put('/api/user/password/update', userData);
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response.data);
+    }
+});
+
+export const sendCodeToEmail = createAsyncThunk<EmailData, EmailData>('/api/user/email/send', async (userData, { rejectWithValue }) => {
+    try {
+        const response: any = await axiosInstance.put('/api/user/email/send', userData);
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response.data);
+    }
+});
+
+
+export const updateEmail = createAsyncThunk<EmailData, EmailData>('/api/user/email/update', async (userData, { rejectWithValue }) => {
+    try {
+        const response: any = await axiosInstance.put('/api/user/email/update', userData);
         return response.data;
     } catch (error: any) {
         return rejectWithValue(error.response.data);
