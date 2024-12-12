@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moallimi.moallimi.model.Lesson;
+import com.moallimi.moallimi.payload.dto.LessonWithClasseWithSubscriptionsDTO;
 import com.moallimi.moallimi.payload.dto.LessonWithSubscriptionsDTO;
 import com.moallimi.moallimi.service.LessonService;
 
@@ -30,11 +31,12 @@ public class LessonController {
     }
 
     @GetMapping("/all/{page}/{size}/{studentId}")
-    public Page<LessonWithSubscriptionsDTO> getAllLessons(@PathVariable("page") int page,
-            @PathVariable("size") int size, @RequestParam(value = "recent", defaultValue = "true") Boolean recent,
+    public Page<LessonWithClasseWithSubscriptionsDTO> getAllLessons(@PathVariable("page") int page,
+            @PathVariable("size") int size,
+            @PathVariable("studentId") Long studentId,
+            @RequestParam(value = "recent", defaultValue = "true") Boolean recent,
             @RequestParam(value = "face_to_face", defaultValue = "false") Boolean faceToFace,
-            @RequestParam(value = "remote", defaultValue = "false") Boolean remote,
-            @PathVariable("studentId") Long studentId) {
+            @RequestParam(value = "remote", defaultValue = "false") Boolean remote) {
         return lessonService.getAllLessons(page, size, recent, faceToFace, remote, studentId);
     }
 

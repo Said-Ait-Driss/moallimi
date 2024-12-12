@@ -36,7 +36,7 @@ public interface LessonSubscriptionsRepository extends JpaRepository<LessonSubsc
         @Query("SELECT COUNT(l.student)"
                         +
                         "FROM LessonSubscriptions l WHERE l.lesson.id = :lessonId")
-        public Long findCountsByLessonId(@Param("lessonId") Long lessonId);
+        public int findCountsByLessonId(@Param("lessonId") Long lessonId);
 
 
         Optional<LessonSubscriptions> findByStudentIdAndLessonId(Long studentId, Long lessonId);

@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import com.moallimi.moallimi.model.Lesson;
 import com.moallimi.moallimi.model.LessonSubscriptions;
+import com.moallimi.moallimi.payload.dto.LessonWithClasseDTO;
+import com.moallimi.moallimi.payload.dto.LessonWithClasseWithSubscriptionsDTO;
 import com.moallimi.moallimi.payload.dto.LessonWithSubscriptionsDTO;
 import com.moallimi.moallimi.repository.LessonDiscussionRepository;
 import com.moallimi.moallimi.repository.LessonRepository;
@@ -36,31 +38,27 @@ public class LessonService {
         return lessonRepository.save(lesson);
     }
 
-    public Page<LessonWithSubscriptionsDTO> getAllLessons(int page, int size, Boolean recent, Boolean faceToFace,
+    public Page<LessonWithClasseWithSubscriptionsDTO> getAllLessons(int page, int size, Boolean recent, Boolean faceToFace,
             Boolean remote, Long studentId) {
-        Pageable pageable = null;
-        if (recent) {
-            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt").descending());
-        } else if (faceToFace) {
-            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "lessonType").ascending());
-        } else if (remote) {
-            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "lessonType").descending());
-        } else {
-            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id").descending());
+        Pageable pageable = createPageable(page, size, recent, faceToFace, remote);
+
+        Page<LessonWithClasseDTO> lessonsPage = lessonRepository.findAllLessons(pageable);
+
+        List<LessonWithClasseWithSubscriptionsDTO> lessonWithSubscriptionsList = new ArrayList<>();
+        if (lessonsPage.hasContent()) {
+
+            for (LessonWithClasseDTO lesson : lessonsPage.getContent()) {
+                int studentCount = lessonSubscriptionsRepository.findCountsByLessonId(lesson.getId());
+                Boolean isSubscribed = lessonSubscriptionsRepository
+                        .findByStudentIdAndLessonId(studentId, lesson.getId())
+                        .isPresent();
+                int commentsCount = lessonDiscussionRepository.findCountByLessonId(lesson.getId());
+
+                lessonWithSubscriptionsList
+                        .add(new LessonWithClasseWithSubscriptionsDTO(lesson, studentCount, commentsCount, isSubscribed));
+            }
         }
 
-        Page<Lesson> lessonsPage = lessonRepository.findAll(pageable);
-
-        List<LessonWithSubscriptionsDTO> lessonWithSubscriptionsList = new ArrayList<>();
-        for (Lesson lesson : lessonsPage.getContent()) {
-            Long studentCount = lessonSubscriptionsRepository.findCountsByLessonId(lesson.getId());
-            Boolean isSubscribed = lessonSubscriptionsRepository.findByStudentIdAndLessonId(studentId, lesson.getId())
-                    .isPresent();
-            Long commentsCount = lessonDiscussionRepository.findCountByLessonId(lesson.getId());
-
-            lessonWithSubscriptionsList
-                    .add(new LessonWithSubscriptionsDTO(lesson, studentCount, commentsCount, isSubscribed));
-        }
         return new PageImpl<>(lessonWithSubscriptionsList, pageable, lessonsPage.getTotalElements());
     }
 
@@ -74,10 +72,10 @@ public class LessonService {
 
         for (LessonSubscriptions lessonSubscription : lessonsSubscriptionsPage.getContent()) {
             Lesson lesson = lessonSubscription.getLesson();
-            Long studentCount = lessonSubscriptionsRepository.findCountsByLessonId(lesson.getId());
+            int studentCount = lessonSubscriptionsRepository.findCountsByLessonId(lesson.getId());
             Boolean isSubscribed = lessonSubscriptionsRepository.findByStudentIdAndLessonId(studentId, lesson.getId())
                     .isPresent();
-            Long commentsCount = lessonDiscussionRepository.findCountByLessonId(lesson.getId());
+            int commentsCount = lessonDiscussionRepository.findCountByLessonId(lesson.getId());
             lessonWithSubscriptionsList
                     .add(new LessonWithSubscriptionsDTO(lesson, studentCount, commentsCount, isSubscribed));
         }
@@ -87,8 +85,8 @@ public class LessonService {
     public LessonWithSubscriptionsDTO getLesson(Long id, Long studentId) {
         Optional<Lesson> lesson = lessonRepository.findById(id);
         if (lesson.isPresent()) {
-            Long studentCount = lessonSubscriptionsRepository.findCountsByLessonId(id);
-            Long commentsCount = lessonDiscussionRepository.findCountByLessonId(id);
+            int studentCount = lessonSubscriptionsRepository.findCountsByLessonId(id);
+            int commentsCount = lessonDiscussionRepository.findCountByLessonId(id);
             Boolean isSubscribed = lessonSubscriptionsRepository.findByStudentIdAndLessonId(studentId, id).isPresent();
 
             return new LessonWithSubscriptionsDTO(lesson.get(), studentCount, commentsCount, isSubscribed);
@@ -122,4 +120,15 @@ public class LessonService {
         return lessonRepository.save(lessonToValidate);
     }
 
+    private Pageable createPageable(int page, int size, Boolean recent, Boolean faceToFace, Boolean remote) {
+        if (Boolean.TRUE.equals(recent)) {
+            return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        } else if (Boolean.TRUE.equals(faceToFace)) {
+            return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "lessonType"));
+        } else if (Boolean.TRUE.equals(remote)) {
+            return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "lessonType"));
+        } else {
+            return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        }
+    }
 }

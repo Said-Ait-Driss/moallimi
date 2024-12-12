@@ -16,7 +16,7 @@ public interface LessonDiscussionRepository extends JpaRepository<LessonDiscussi
     @Query("SELECT COUNT(DISTINCT l.user)"
             +
             "FROM LessonDiscussion l WHERE l.lesson.id = :lessonId")
-    public Long findCountByLessonId(@Param("lessonId") Long lessonId);
+    public int findCountByLessonId(@Param("lessonId") Long lessonId);
 
     @Query("SELECT new com.moallimi.moallimi.payload.response.LessonDiscussionWithoutLessonDTO(ld.id, ld.user, ld.comment, ld.isDeleted, ld.createdAt) "
             +
