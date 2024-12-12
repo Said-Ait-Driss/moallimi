@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import Filter from '@/components/dashboard/shared/filter';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Pagination from '@/components/dashboard/shared/pagination';
+import { useSession } from 'next-auth/react';
 
 const filters = [
     { id: 1, name: 'profession' },
@@ -25,6 +26,10 @@ export default function Teacher() {
     const [query, setQuery] = useState('');
 
     const dispatch = useAppDispatch();
+    const { data: session, status } = useSession();
+
+    let studentId = session?.user.roles.includes('ROLE_STUDENT') ? session.user.id : -1;
+
     const loading = useSelector((state: RootState) => state.teacher.loading);
     const teachers: any = useSelector((state: RootState) => state.teacher.teachers);
     const totalElements: number | string = useSelector((state: RootState) => state.teacher.totalElements);
@@ -40,7 +45,7 @@ export default function Teacher() {
     const filter = searchParams.get('filter') || -1;
 
     useEffect(() => {
-        const result = dispatch(teachersList({ page, size, query: sQuery, filter }));
+        const result = dispatch(teachersList({ page, size, studentId, query: sQuery, filter }));
         return () => {
             result.abort();
         };
@@ -109,7 +114,13 @@ export default function Teacher() {
                     {loading && !error
                         ? 'loading'
                         : teachers?.content?.map((item: any) => (
-                              <TeacherCard teacher={item.teacher} reviews={item.reviews} key={item.teacher?.id} />
+                              <TeacherCard
+                                  teacher={item.teacher}
+                                  reviews={item.reviews}
+                                  key={item.teacher?.id}
+                                  isFollowed={item.isFollowed}
+                                  user={session?.user}
+                              />
                           )) || null}
                 </div>
                 <Pagination currentPage={page} totalResults={totalElements} resultsPerPage={size} onPageChange={onPageChange} />

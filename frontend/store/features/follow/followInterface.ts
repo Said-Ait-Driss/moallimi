@@ -1,6 +1,6 @@
 
 
-export interface Teacher{
+export interface Follow{
     id: number,
     name: string,
     email: string,
@@ -8,8 +8,8 @@ export interface Teacher{
     address: string,
 }
 
-export interface TeacherState {
-    teachers: Teacher[] | any;
+export interface FollowState {
+    followers: Follow[] | any;
     loading: boolean;
     totalElements:number;
     error: string | null;

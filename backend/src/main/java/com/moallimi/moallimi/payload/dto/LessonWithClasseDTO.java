@@ -28,7 +28,7 @@ public class LessonWithClasseDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private ClasseDTO classe;
-    private Teacher teacher;
+    private WantedTeacherFieldsDTO teacher;
     private LessonCategory lessonCategory;
     private LessonType lessonType;
 

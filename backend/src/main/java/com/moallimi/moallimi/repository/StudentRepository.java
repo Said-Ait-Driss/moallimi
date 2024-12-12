@@ -24,4 +24,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query("SELECT s FROM Student s WHERE s.city LIKE %:city%")
     Page<Student> findByCityContaining(@Param("city") String city, Pageable pageable);
 
+    @Query("SELECT CASE WHEN COUNT(ft) > 0 THEN true ELSE false END " +
+            "FROM Student s JOIN s.followedTeachers ft " +
+            "WHERE s.id = :studentId AND ft.id = :teacherId")
+    Boolean isTeacherFollowedByStudent(@Param("studentId") Long studentId, @Param("teacherId") Long teacherId);
+
 }

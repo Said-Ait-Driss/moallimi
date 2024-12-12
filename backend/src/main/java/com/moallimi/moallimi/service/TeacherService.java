@@ -10,10 +10,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.moallimi.moallimi.model.Student;
 import com.moallimi.moallimi.model.Teacher;
 import com.moallimi.moallimi.payload.dto.ReviewStatDTO;
+import com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO;
 import com.moallimi.moallimi.payload.response.TeachersWithReviewsDTO;
 import com.moallimi.moallimi.repository.ReviewRepository;
+import com.moallimi.moallimi.repository.StudentRepository;
 import com.moallimi.moallimi.repository.TeacherRepository;
 
 @Service
@@ -23,16 +26,19 @@ public class TeacherService {
     private TeacherRepository teacherRepository;
 
     @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
     private ReviewRepository reviewRepository;
 
     public Teacher updateTeacher(Teacher teahcer) {
         return this.teacherRepository.save(teahcer);
     }
 
-    public Page<TeachersWithReviewsDTO> getAllTeachers(int page, int size, int filter, String query) {
+    public Page<TeachersWithReviewsDTO> getAllTeachers(int page, int size, Long studentId, int filter, String query) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Teacher> teachersPage;
+        Page<WantedTeacherFieldsDTO> teachersPage;
 
         switch (filter) {
             case 1: // Filter by profession
@@ -48,15 +54,18 @@ public class TeacherService {
                 teachersPage = this.teacherRepository.findByCityContaining(query, pageable);
                 break;
             default: // If no valid filter is provided, all students
-                teachersPage = this.teacherRepository.findAll(pageable);
+                teachersPage = this.teacherRepository.findAllTeachers(pageable);
                 break;
         }
 
         List<TeachersWithReviewsDTO> teacherWithReviewsList = new ArrayList<>();
 
-        for (Teacher teacher : teachersPage.getContent()) {
+        for (WantedTeacherFieldsDTO teacher : teachersPage.getContent()) {
             ReviewStatDTO reviewStat = reviewRepository.findReviewStatsByTeacherId(teacher.getId());
-            teacherWithReviewsList.add(new TeachersWithReviewsDTO(teacher, reviewStat));
+            Boolean isFollowed = (studentId != -1)
+                    ? studentRepository.isTeacherFollowedByStudent(studentId, teacher.getId())
+                    : false;
+            teacherWithReviewsList.add(new TeachersWithReviewsDTO(teacher, reviewStat, isFollowed));
         }
         return new PageImpl<>(teacherWithReviewsList, pageable, teachersPage.getTotalElements());
     }

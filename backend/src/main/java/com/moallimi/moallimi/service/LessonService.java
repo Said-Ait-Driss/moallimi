@@ -38,11 +38,12 @@ public class LessonService {
         return lessonRepository.save(lesson);
     }
 
-    public Page<LessonWithClasseWithSubscriptionsDTO> getAllLessons(int page, int size, Boolean recent, Boolean faceToFace,
+    public Page<LessonWithClasseWithSubscriptionsDTO> getAllLessons(int page, int size, Boolean recent,
+            Boolean faceToFace,
             Boolean remote, Long studentId) {
         Pageable pageable = createPageable(page, size, recent, faceToFace, remote);
 
-        Page<LessonWithClasseDTO> lessonsPage = lessonRepository.findAllLessons(pageable);
+        Page<LessonWithClasseDTO> lessonsPage = lessonRepository.findAllLessonsByFollowedTeachers(studentId, pageable);
 
         List<LessonWithClasseWithSubscriptionsDTO> lessonWithSubscriptionsList = new ArrayList<>();
         if (lessonsPage.hasContent()) {
@@ -55,7 +56,8 @@ public class LessonService {
                 int commentsCount = lessonDiscussionRepository.findCountByLessonId(lesson.getId());
 
                 lessonWithSubscriptionsList
-                        .add(new LessonWithClasseWithSubscriptionsDTO(lesson, studentCount, commentsCount, isSubscribed));
+                        .add(new LessonWithClasseWithSubscriptionsDTO(lesson, studentCount, commentsCount,
+                                isSubscribed));
             }
         }
 

@@ -31,10 +31,11 @@ public class TeacherController {
         return teacherService.updateTeacher(teacher);
     }
 
-    @GetMapping("/all/{page}/{size}")
+    @GetMapping("/all/{page}/{size}/{studentId}")
     public Page<TeachersWithReviewsDTO> getAllTeachers(@PathVariable("page") int page, @PathVariable("size") int size,
+            @PathVariable("studentId") Long studentId,
             @RequestParam(value = "filter", defaultValue = "-1") int filter,
             @RequestParam(value = "query", defaultValue = "") String query) {
-        return teacherService.getAllTeachers(page, size, filter, query);
+        return teacherService.getAllTeachers(page, size, studentId, filter, query);
     }
 }

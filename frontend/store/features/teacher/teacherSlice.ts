@@ -16,6 +16,40 @@ const teacherSlice = createSlice({
     reducers: {
         SET_TEACHERS(state, action) {
             state.teachers = action.payload;
+        },
+        SET_FOLLOW_TEACHER(state, action) {
+            return {
+                ...state,
+                teachers: {
+                    ...state.teachers,
+                    content: state.teachers.content.map((item: any) => {
+                        if (item.teacher.id == action.payload.teacherId) {
+                            return {
+                                ...item,
+                                isFollowed: true
+                            };
+                        }
+                        return item;
+                    })
+                }
+            };
+        },
+        SET_UNFOLLOW_TEACHER(state, action) {
+            return {
+                ...state,
+                teachers: {
+                    ...state.teachers,
+                    content: state.teachers.content.map((item: any) => {
+                        if (item.teacher.id == action.payload.teacherId) {
+                            return {
+                                ...item,
+                                isFollowed: false
+                            };
+                        }
+                        return item;
+                    })
+                }
+            };
         }
     },
     extraReducers: (builder) => {
@@ -36,7 +70,7 @@ const teacherSlice = createSlice({
     }
 });
 
-export const { SET_TEACHERS } = teacherSlice.actions;
+export const { SET_TEACHERS, SET_FOLLOW_TEACHER, SET_UNFOLLOW_TEACHER } = teacherSlice.actions;
 export const selectTeachers = (state: RootState) => state.teacher.teachers;
 
 export default teacherSlice.reducer;
