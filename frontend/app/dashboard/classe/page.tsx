@@ -10,6 +10,7 @@ import { CgClose } from 'react-icons/cg';
 import { useSelector } from 'react-redux';
 import Filter from '@/components/dashboard/shared/filter';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 const filters = [
     { id: 1, name: 'Academic Level' },
@@ -20,6 +21,8 @@ export default function Classe() {
     const [inforOpen, setInfoOpen] = useState(true);
 
     const dispatch = useAppDispatch();
+    const { data: session, status } = useSession();
+
     const [selectedFilter, setSelectedFilter] = useState(filters[1]);
     const [query, setQuery] = useState('');
 
@@ -31,12 +34,14 @@ export default function Classe() {
     const sQuery = searchParams.get('query') || '';
     const filter = searchParams.get('filter') || -1;
 
+    let studentId = session?.user.roles?.includes('ROLE_STUDENT') ? session?.user.id : -1;
+
     const classes: any = useSelector((state: RootState) => state.classe.classes);
     const loading: any = useSelector((state: RootState) => state.classe.loading);
     const error: any = useSelector((state: RootState) => state.lesson.error);
 
     useEffect(() => {
-        const result = dispatch(classesList({ page, size, query: sQuery, filter }));
+        const result = dispatch(classesList({ page, size, query: sQuery, filter, studentId }));
         return () => {
             result.abort();
         };
@@ -90,9 +95,7 @@ export default function Classe() {
                         'loading'
                     ) : (
                         <div className="-mx-px border-l border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3">
-                            {classes.content?.map((classe: any) => (
-                                <ClasseCard key={classe.id} classe={classe} />
-                            ))}
+                            {classes.content?.map((classe: any) => <ClasseCard key={classe.id} classe={classe} user={session?.user} />)}
                         </div>
                     )}
                 </div>

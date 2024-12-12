@@ -16,10 +16,11 @@ public class ClassesListResponse {
     private Boolean isDeleted;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Boolean isEnrolled;
 
     public ClassesListResponse(Long id, String title, String image, AcademicLevel academicLevel, Long studentCount,
             Boolean isDeleted,
-            LocalDateTime createdAt, LocalDateTime updatedAt) {
+            LocalDateTime createdAt, LocalDateTime updatedAt, Boolean isEnrolled) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -29,5 +30,6 @@ public class ClassesListResponse {
         this.isDeleted = isDeleted;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.isEnrolled = isEnrolled;
     }
 }

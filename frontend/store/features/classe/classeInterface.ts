@@ -6,7 +6,8 @@ export interface Classe{
 }
 
 export interface ClasseState {
-    classes: Classe[];
+    classes: Classe[] | any;
     loading: boolean;
+    enrollLoading: boolean;
     error: string | null;
 }

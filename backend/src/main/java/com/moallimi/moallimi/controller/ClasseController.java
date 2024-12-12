@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moallimi.moallimi.model.Classe;
+import com.moallimi.moallimi.payload.request.EnrollStudentToClasseRequest;
 import com.moallimi.moallimi.payload.response.ClassesListResponse;
 import com.moallimi.moallimi.service.ClasseService;
 
@@ -32,11 +34,12 @@ public class ClasseController {
         return classeService.addClasse(classe);
     }
 
-    @GetMapping("/all/{page}/{size}")
+    @GetMapping("/all/{page}/{size}/{studentId}")
     public Page<ClassesListResponse> getAllClasse(@PathVariable("page") int page, @PathVariable("size") int size,
+            @PathVariable("studentId") Long studentId,
             @RequestParam(value = "filter", defaultValue = "-1") int filter,
             @RequestParam(value = "query", defaultValue = "") String query) {
-        return classeService.getAllClasse(page, size, filter, query);
+        return classeService.getAllClasse(page, size, studentId, filter, query);
     }
 
     @PutMapping("/update")
@@ -52,5 +55,15 @@ public class ClasseController {
     @GetMapping("/of-academic-level/{academicLevelId}")
     public List<Classe> getClassesOfAcademicLevel(@PathVariable Long academicLevelId) {
         return classeService.getClassesOfAcademicLevel(academicLevelId);
+    }
+
+    @PostMapping("/enroll")
+    public ResponseEntity<?> enrollStudentToClasse(@RequestBody EnrollStudentToClasseRequest request) {
+        return classeService.enrollStudentToClasse(request.getClasseId(), request.getStudentId());
+    }
+
+    @PostMapping("/unenroll")
+    public ResponseEntity<?> unEnrollStudentToClasse(@RequestBody EnrollStudentToClasseRequest request) {
+        return classeService.unEnrollStudentFromClasse(request.getClasseId(), request.getStudentId());
     }
 }
