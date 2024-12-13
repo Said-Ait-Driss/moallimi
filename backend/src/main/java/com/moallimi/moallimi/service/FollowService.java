@@ -18,6 +18,9 @@ public class FollowService {
     @Autowired
     private TeacherRepository teacherRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public void followTeacher(Long studentId, Long teacherId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
@@ -29,6 +32,8 @@ public class FollowService {
             teacher.getFollowers().add(student);
             studentRepository.save(student);
             teacherRepository.save(teacher);
+            // Notify the teacher
+            notificationService.notifyTeacherNewFollower(teacher.getId(),student.getFirstName(),student.getLastName(), student.getId());
         }
     }
 
