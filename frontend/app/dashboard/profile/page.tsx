@@ -172,7 +172,7 @@ export default function Profile() {
                                     {profileData.user?.firstName + ' ' + profileData.user?.lastName}
                                 </h1>
                             )}
-                            {loading ? 'loading' : <div className="text-sm text-gray-500">{profileData.user?.academicLevel?.name || 'Unknow'}</div>}
+                            {loading ? 'loading' : <div className="text-sm text-gray-500">{profileData.user?.academicLevel?.name || profileData.user?.academicSpecialist?.name || 'Unknow'}</div>}
                             {loading ? 'loading' : <div className="text-sm text-gray-500">{profileData.user?.profession || 'Unknow'}</div>}
                         </div>
                         <div className="flex gap-2 w-full justify-end sm:mx-4 my-1">

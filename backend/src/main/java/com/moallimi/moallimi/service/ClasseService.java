@@ -34,8 +34,6 @@ public class ClasseService {
 
         Pageable pageable = PageRequest.of(page, size);
         switch (filter) {
-            case 1: // Filter by title
-                return this.classeRepository.findByAcademicLevelContaining(query, pageable, studentId);
             case 2: // Filter by academic level
                 return this.classeRepository.findByTitleContaining(query, pageable, studentId);
             default: // If no valid filter is provided, all classes

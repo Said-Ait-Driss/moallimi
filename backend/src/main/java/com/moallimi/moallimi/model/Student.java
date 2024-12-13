@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -18,7 +19,7 @@ import lombok.Data;
 @DiscriminatorValue("STUDENT")
 public class Student extends User {
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.MERGE)
   private AcademicLevel academicLevel;
 
   @OneToOne

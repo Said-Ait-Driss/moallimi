@@ -35,10 +35,11 @@ public class StudentController {
         return studentService.getAllStudents();
     }
 
-    @GetMapping("/all/{page}/{size}")
+    @GetMapping("/all/{page}/{size}/{studentId}")
     public Page<Student> getAllStudents(@PathVariable("page") int page, @PathVariable("size") int size,
+            @PathVariable("studentId") Long studentId,
             @RequestParam(value = "filter", defaultValue = "-1") int filter,
             @RequestParam(value = "query", defaultValue = "") String query) {
-        return studentService.getAllStudents(page, size, filter, query);
+        return studentService.getAllStudents(page, size, studentId, filter, query);
     }
 }

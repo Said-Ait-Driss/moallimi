@@ -12,10 +12,10 @@ import { useEffect, useState } from 'react';
 import { CgClose } from 'react-icons/cg';
 import { useSelector } from 'react-redux';
 import Pagination from '@/components/dashboard/shared/pagination';
+import { useSession } from 'next-auth/react';
 
 const filters = [
     { id: 1, name: 'classes' },
-    { id: 2, name: 'Academic Level' },
     { id: 3, name: 'Full Name' },
     { id: 4, name: 'City' }
 ];
@@ -27,6 +27,11 @@ export default function Student() {
     const [selectedFilter, setSelectedFilter] = useState(filters[1]);
     const [query, setQuery] = useState('');
 
+    const dispatch = useAppDispatch();
+    const { data: session, status } = useSession();
+
+    let studentId = session?.user.roles.includes('ROLE_STUDENT') ? session.user.id : -1;
+
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -35,7 +40,6 @@ export default function Student() {
     const sQuery = searchParams.get('query') || '';
     const filter = searchParams.get('filter') || -1;
 
-    const dispatch = useAppDispatch();
     const loading = useSelector((state: RootState) => state.student.loading);
     const students: any = useSelector((state: RootState) => state.student.students);
     const totalElements: number | string = useSelector((state: RootState) => state.student.totalElements);
@@ -43,7 +47,7 @@ export default function Student() {
     const error = useSelector((state: RootState) => state.student.error);
 
     useEffect(() => {
-        const result = dispatch(studentsList({ page, size, query: sQuery, filter }));
+        const result = dispatch(studentsList({ page, size, studentId, query: sQuery, filter }));
         return () => {
             result.abort();
         };
@@ -56,7 +60,7 @@ export default function Student() {
         new_searchParams.set('query', query);
 
         const newUrl = `${window.location.pathname}?${new_searchParams.toString()}`;
-        const result = await dispatch(studentsList({ page, size, query: query, filter: selectedFilter.id.toString() }));
+        const result = await dispatch(studentsList({ page, size, studentId, query: query, filter: selectedFilter.id.toString() }));
         if (studentsList.fulfilled.match(result)) {
             router.replace(newUrl);
         }
@@ -108,7 +112,9 @@ export default function Student() {
                 </div>
                 <div className="grid grid-cols-2 sm:mx-0 md:grid-cols-3">
                     {error ? <ErrorAlert title="service not available right now" message="something wrong went happened please try later ." /> : ''}
-                    {loading && !error ? 'loading' : students.content?.map((student: any) => <StudentCard student={student} />)}
+                    {loading && !error
+                        ? 'loading'
+                        : students.content?.map((student: any) => student.id != studentId && <StudentCard student={student} />)}
                 </div>
                 <Pagination currentPage={page} totalResults={totalElements} resultsPerPage={size} onPageChange={onPageChange} />
             </div>

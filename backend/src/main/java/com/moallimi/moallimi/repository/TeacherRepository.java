@@ -13,29 +13,26 @@ import com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO;
 @Repository
 public interface TeacherRepository extends JpaRepository<Teacher, Long> {
 
-    @Query("SELECT new com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO(t.id, t.email, t.username, t.firstName, t.lastName, t.phoneNumber, t.address, t.birthDate, t.image, t.profession, t.cover, t.city, t.about, t.gender, t.isDeleted, t.isSuspended, t.academicSpecialist, t.isApproved, t.website, t.createdAt, t.updatedAt) "
-            +
-            "FROM Teacher t WHERE t.profession LIKE %:profession%")
-    Page<WantedTeacherFieldsDTO> findByProfessionContaining(@Param("profession") String profession, Pageable pageable);
+        @Query("SELECT new com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO(t.id, t.email, t.username, t.firstName, t.lastName, t.phoneNumber, t.address, t.birthDate, t.image, t.profession, t.cover, t.city, t.about, t.gender, t.isDeleted, t.isSuspended, t.academicSpecialist, t.isApproved, t.website, t.createdAt, t.updatedAt) "
+                        +
+                        "FROM Teacher t WHERE t.profession LIKE %:profession% AND t.academicSpecialist.id = :academicLevelId")
+        Page<WantedTeacherFieldsDTO> findByProfessionContaining(@Param("profession") String profession,
+                        @Param("academicLevelId") Long academicLevelId, Pageable pageable);
 
-    @Query("SELECT new com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO(t.id, t.email, t.username, t.firstName, t.lastName, t.phoneNumber, t.address, t.birthDate, t.image, t.profession, t.cover, t.city, t.about, t.gender, t.isDeleted, t.isSuspended, t.academicSpecialist, t.isApproved, t.website, t.createdAt, t.updatedAt) "
-            +
-            "FROM Teacher t WHERE t.academicSpecialist.name LIKE %:academicLevel%")
-    Page<WantedTeacherFieldsDTO> findByAcademicLevelContaining(@Param("academicLevel") String academicLevel,
-            Pageable pageable);
+        @Query("SELECT new com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO(t.id, t.email, t.username, t.firstName, t.lastName, t.phoneNumber, t.address, t.birthDate, t.image, t.profession, t.cover, t.city, t.about, t.gender, t.isDeleted, t.isSuspended, t.academicSpecialist, t.isApproved, t.website, t.createdAt, t.updatedAt) "
+                        +
+                        "FROM Teacher t WHERE CONCAT(t.firstName, ' ', t.lastName) LIKE %:fullName% AND t.academicSpecialist.id = :academicLevelId")
+        Page<WantedTeacherFieldsDTO> findByFullNameContaining(@Param("fullName") String fullName,
+                        @Param("academicLevelId") Long academicLevelId, Pageable pageable);
 
-    @Query("SELECT new com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO(t.id, t.email, t.username, t.firstName, t.lastName, t.phoneNumber, t.address, t.birthDate, t.image, t.profession, t.cover, t.city, t.about, t.gender, t.isDeleted, t.isSuspended, t.academicSpecialist, t.isApproved, t.website, t.createdAt, t.updatedAt) "
-            +
-            "FROM Teacher t WHERE CONCAT(t.firstName, ' ', t.lastName) LIKE %:fullName%")
-    Page<WantedTeacherFieldsDTO> findByFullNameContaining(@Param("fullName") String fullName, Pageable pageable);
+        @Query("SELECT new com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO(t.id, t.email, t.username, t.firstName, t.lastName, t.phoneNumber, t.address, t.birthDate, t.image, t.profession, t.cover, t.city, t.about, t.gender, t.isDeleted, t.isSuspended, t.academicSpecialist, t.isApproved, t.website, t.createdAt, t.updatedAt) "
+                        +
+                        "FROM Teacher t WHERE t.city LIKE %:city% AND t.academicSpecialist.id = :academicLevelId")
+        Page<WantedTeacherFieldsDTO> findByCityContaining(@Param("city") String city,
+                        @Param("academicLevelId") Long academicLevelId, Pageable pageable);
 
-    @Query("SELECT new com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO(t.id, t.email, t.username, t.firstName, t.lastName, t.phoneNumber, t.address, t.birthDate, t.image, t.profession, t.cover, t.city, t.about, t.gender, t.isDeleted, t.isSuspended, t.academicSpecialist, t.isApproved, t.website, t.createdAt, t.updatedAt) "
-            +
-            "FROM Teacher t WHERE t.city LIKE %:city%")
-    Page<WantedTeacherFieldsDTO> findByCityContaining(@Param("city") String city, Pageable pageable);
-
-    @Query("SELECT new com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO(t.id, t.email, t.username, t.firstName, t.lastName, t.phoneNumber, t.address, t.birthDate, t.image, t.profession, t.cover, t.city, t.about, t.gender, t.isDeleted, t.isSuspended, t.academicSpecialist, t.isApproved, t.website, t.createdAt, t.updatedAt) "
-            +
-            "FROM Teacher t")
-    Page<WantedTeacherFieldsDTO> findAllTeachers(Pageable pageable);
+        @Query("SELECT new com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO(t.id, t.email, t.username, t.firstName, t.lastName, t.phoneNumber, t.address, t.birthDate, t.image, t.profession, t.cover, t.city, t.about, t.gender, t.isDeleted, t.isSuspended, t.academicSpecialist, t.isApproved, t.website, t.createdAt, t.updatedAt) "
+                        +
+                        "FROM Teacher t WHERE t.academicSpecialist.id = :academicLevelId")
+        Page<WantedTeacherFieldsDTO> findAllTeachers(@Param("academicLevelId") Long academicLevelId, Pageable pageable);
 }

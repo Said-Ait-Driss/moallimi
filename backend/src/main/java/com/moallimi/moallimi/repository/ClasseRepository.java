@@ -15,28 +15,21 @@ import com.moallimi.moallimi.payload.response.ClassesListResponse;
 
 @Repository
 public interface ClasseRepository extends JpaRepository<Classe, Long> {
-    public List<Classe> findByAcademicLevelId(Long academicLevelId);
+        public List<Classe> findByAcademicLevelId(Long academicLevelId);
 
-    @Query("SELECT new com.moallimi.moallimi.payload.response.ClassesListResponse(c.id, c.title, c.image, c.academicLevel, "
-            +
-            "(SELECT COUNT(s) FROM c.students s), c.isDeleted, c.createdAt, c.updatedAt, " +
-            "(SELECT COUNT(s) FROM c.students s WHERE s.id = :studentId) > 0) " +
-            "FROM Classe c WHERE c.isDeleted = false")
-    Page<ClassesListResponse> findAllActiveClasses(Pageable pageable, Long studentId);
+        @Query("SELECT new com.moallimi.moallimi.payload.response.ClassesListResponse(c.id, c.title, c.image, c.academicLevel, "
+                        +
+                        "(SELECT COUNT(s) FROM c.students s), c.isDeleted, c.createdAt, c.updatedAt, " +
+                        "(SELECT COUNT(s) FROM c.students s WHERE s.id = :studentId) > 0) " +
+                        "FROM Classe c WHERE c.isDeleted = false AND c.academicLevel.id = (SELECT s.academicLevel.id FROM Student s WHERE s.id = :studentId)")
+        Page<ClassesListResponse> findAllActiveClasses(Pageable pageable, Long studentId);
 
-    @Query("SELECT new com.moallimi.moallimi.payload.response.ClassesListResponse(c.id, c.title, c.image, c.academicLevel, "
-            +
-            "(SELECT COUNT(s) FROM c.students s), c.isDeleted, c.createdAt, c.updatedAt, " +
-            "(SELECT COUNT(s) FROM c.students s WHERE s.id = :studentId) > 0) " +
-            "FROM Classe c WHERE c.isDeleted = false AND c.title LIKE %:title%")
-    Page<ClassesListResponse> findByTitleContaining(@Param("title") String title, Pageable pageable, Long studentId);
-
-    @Query("SELECT new com.moallimi.moallimi.payload.response.ClassesListResponse(c.id, c.title, c.image, c.academicLevel, "
-            +
-            "(SELECT COUNT(s) FROM c.students s), c.isDeleted, c.createdAt, c.updatedAt," +
-            "(SELECT COUNT(s) FROM c.students s WHERE s.id = :studentId) > 0) " +
-            "FROM Classe c WHERE c.isDeleted = false AND c.academicLevel.name LIKE %:academicLevel%")
-    Page<ClassesListResponse> findByAcademicLevelContaining(@Param("academicLevel") String academicLevel,
-            Pageable pageable, Long studentId);
+        @Query("SELECT new com.moallimi.moallimi.payload.response.ClassesListResponse(c.id, c.title, c.image, c.academicLevel, "
+                        +
+                        "(SELECT COUNT(s) FROM c.students s), c.isDeleted, c.createdAt, c.updatedAt, " +
+                        "(SELECT COUNT(s) FROM c.students s WHERE s.id = :studentId) > 0) " +
+                        "FROM Classe c WHERE c.isDeleted = false AND c.title LIKE %:title% AND c.academicLevel.id = (SELECT s.academicLevel.id FROM Student s WHERE s.id = :studentId)")
+        Page<ClassesListResponse> findByTitleContaining(@Param("title") String title, Pageable pageable,
+                        Long studentId);
 
 }

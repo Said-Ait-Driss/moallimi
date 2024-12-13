@@ -10,14 +10,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.moallimi.moallimi.model.AcademicLevel;
 import com.moallimi.moallimi.model.Student;
 import com.moallimi.moallimi.model.Teacher;
+import com.moallimi.moallimi.model.User;
 import com.moallimi.moallimi.payload.dto.ReviewStatDTO;
 import com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO;
 import com.moallimi.moallimi.payload.response.TeachersWithReviewsDTO;
 import com.moallimi.moallimi.repository.ReviewRepository;
 import com.moallimi.moallimi.repository.StudentRepository;
 import com.moallimi.moallimi.repository.TeacherRepository;
+import com.moallimi.moallimi.enums.EnumRole;
 
 @Service
 public class TeacherService {
@@ -31,30 +34,44 @@ public class TeacherService {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Autowired
+    UserService userService;
+
     public Teacher updateTeacher(Teacher teahcer) {
         return this.teacherRepository.save(teahcer);
     }
 
     public Page<TeachersWithReviewsDTO> getAllTeachers(int page, int size, Long studentId, int filter, String query) {
+        User user = userService.getUserProfile(studentId);
+        AcademicLevel academicLevel;
+
+        if (user.getRoles() != null && user.getRoles().stream().anyMatch(r -> r.getName() == EnumRole.ROLE_TEACHER)) {
+            Teacher teacher = this.getTeacherProfile(studentId);
+            academicLevel = teacher.getAcademicSpecialist();
+        } else if (user.getRoles() != null
+                && user.getRoles().stream().anyMatch(r -> r.getName() == EnumRole.ROLE_STUDENT)) {
+            Student student = studentRepository.findById(studentId).get();
+            academicLevel = student.getAcademicLevel();
+        } else {
+            academicLevel = new AcademicLevel();
+        }
 
         Pageable pageable = PageRequest.of(page, size);
         Page<WantedTeacherFieldsDTO> teachersPage;
 
         switch (filter) {
             case 1: // Filter by profession
-                teachersPage = this.teacherRepository.findByProfessionContaining(query, pageable);
-                break;
-            case 2: // Filter by academic level
-                teachersPage = this.teacherRepository.findByAcademicLevelContaining(query, pageable);
+                teachersPage = this.teacherRepository.findByProfessionContaining(query, academicLevel.getId(),
+                        pageable);
                 break;
             case 3: // Filter by full name
-                teachersPage = this.teacherRepository.findByFullNameContaining(query, pageable);
+                teachersPage = this.teacherRepository.findByFullNameContaining(query, academicLevel.getId(), pageable);
                 break;
             case 4: // Filter by city
-                teachersPage = this.teacherRepository.findByCityContaining(query, pageable);
+                teachersPage = this.teacherRepository.findByCityContaining(query, academicLevel.getId(), pageable);
                 break;
             default: // If no valid filter is provided, all students
-                teachersPage = this.teacherRepository.findAllTeachers(pageable);
+                teachersPage = this.teacherRepository.findAllTeachers(academicLevel.getId(), pageable);
                 break;
         }
 

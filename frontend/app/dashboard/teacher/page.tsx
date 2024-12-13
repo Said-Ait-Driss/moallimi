@@ -15,7 +15,6 @@ import { useSession } from 'next-auth/react';
 
 const filters = [
     { id: 1, name: 'profession' },
-    { id: 2, name: 'Academic Level' },
     { id: 3, name: 'Full Name' },
     { id: 4, name: 'City' }
 ];
@@ -58,7 +57,7 @@ export default function Teacher() {
         new_searchParams.set('query', query);
 
         const newUrl = `${window.location.pathname}?${new_searchParams.toString()}`;
-        const result = await dispatch(teachersList({ page, size, query: query, filter: selectedFilter.id.toString() }));
+        const result = await dispatch(teachersList({ page, size, studentId, query: query, filter: selectedFilter.id.toString() }));
         if (teachersList.fulfilled.match(result)) {
             router.replace(newUrl);
         }

@@ -81,7 +81,7 @@ export default function TeacherCard({ teacher, reviews, isFollowed, user }: any)
                 </h3>
                 <div>
                     <p className="text-gray-600 text-xs">{new Date(teacher.createdAt.toString()).toDateString()}</p>
-                    <p className="text-gray-600 text-xs">{teacher.academicLevel || 'unknown'}</p>
+                    <p className="text-gray-600 text-xs">{teacher.academicLevel || teacher?.academicSpecialist?.name || 'unknown'}</p>
                 </div>
                 <p className="text-sm text-gray-600 flex items-center justify-center my-2">
                     {[...Array(totalStars)].map((_, index) => (

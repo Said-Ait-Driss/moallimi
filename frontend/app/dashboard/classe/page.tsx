@@ -12,10 +12,7 @@ import Filter from '@/components/dashboard/shared/filter';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
-const filters = [
-    { id: 1, name: 'Academic Level' },
-    { id: 2, name: 'Title' }
-];
+const filters = [{ id: 2, name: 'Title' }];
 
 export default function Classe() {
     const [inforOpen, setInfoOpen] = useState(true);
@@ -23,7 +20,7 @@ export default function Classe() {
     const dispatch = useAppDispatch();
     const { data: session, status } = useSession();
 
-    const [selectedFilter, setSelectedFilter] = useState(filters[1]);
+    const [selectedFilter, setSelectedFilter] = useState(filters[0]);
     const [query, setQuery] = useState('');
 
     const searchParams = useSearchParams();
@@ -54,7 +51,7 @@ export default function Classe() {
         new_searchParams.set('query', query);
 
         const newUrl = `${window.location.pathname}?${new_searchParams.toString()}`;
-        const result = await dispatch(classesList({ page, size, query: query, filter: selectedFilter.id.toString() }));
+        const result = await dispatch(classesList({ page, size, query: query, filter: selectedFilter.id.toString(), studentId }));
         if (classesList.fulfilled.match(result)) {
             router.replace(newUrl);
         }
