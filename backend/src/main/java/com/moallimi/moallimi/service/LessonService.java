@@ -73,7 +73,9 @@ public class LessonService {
         List<LessonWithSubscriptionsDTO> lessonWithSubscriptionsList = new ArrayList<>();
 
         for (LessonSubscriptions lessonSubscription : lessonsSubscriptionsPage.getContent()) {
-            Lesson lesson = lessonSubscription.getLesson();
+            // Lesson lesson = lessonSubscription.getLesson();
+            LessonWithClasseDTO lesson = lessonRepository.findLessonById(lessonSubscription.getLesson().getId());
+
             int studentCount = lessonSubscriptionsRepository.findCountsByLessonId(lesson.getId());
             Boolean isSubscribed = lessonSubscriptionsRepository.findByStudentIdAndLessonId(studentId, lesson.getId())
                     .isPresent();
@@ -85,15 +87,12 @@ public class LessonService {
     }
 
     public LessonWithSubscriptionsDTO getLesson(Long id, Long studentId) {
-        Optional<Lesson> lesson = lessonRepository.findById(id);
-        if (lesson.isPresent()) {
-            int studentCount = lessonSubscriptionsRepository.findCountsByLessonId(id);
-            int commentsCount = lessonDiscussionRepository.findCountByLessonId(id);
-            Boolean isSubscribed = lessonSubscriptionsRepository.findByStudentIdAndLessonId(studentId, id).isPresent();
+        LessonWithClasseDTO lesson = lessonRepository.findLessonById(id);
+        int studentCount = lessonSubscriptionsRepository.findCountsByLessonId(id);
+        int commentsCount = lessonDiscussionRepository.findCountByLessonId(id);
+        Boolean isSubscribed = lessonSubscriptionsRepository.findByStudentIdAndLessonId(studentId, id).isPresent();
 
-            return new LessonWithSubscriptionsDTO(lesson.get(), studentCount, commentsCount, isSubscribed);
-        }
-        return null;
+        return new LessonWithSubscriptionsDTO(lesson, studentCount, commentsCount, isSubscribed);
     }
 
     public Lesson cancelLesson(Long lessonId) {

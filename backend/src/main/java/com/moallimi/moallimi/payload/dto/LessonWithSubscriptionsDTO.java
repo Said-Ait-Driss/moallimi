@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LessonWithSubscriptionsDTO {
 
-    private Lesson lesson;
+    private LessonWithClasseDTO lesson;
     private int subscriptionsCount;
     private int commentsCount;
     private Boolean isSubscribed;

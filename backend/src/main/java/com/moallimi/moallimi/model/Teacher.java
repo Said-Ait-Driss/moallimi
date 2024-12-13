@@ -3,6 +3,8 @@ package com.moallimi.moallimi.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
@@ -18,7 +20,7 @@ public class Teacher extends User{
     private Boolean isApproved;
     private String website;
 
-
+    @JsonIgnore
      @ManyToMany(mappedBy = "followedTeachers")
     private List<Student> followers = new ArrayList<>();
 }

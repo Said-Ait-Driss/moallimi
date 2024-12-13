@@ -3,6 +3,8 @@ package com.moallimi.moallimi.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -14,23 +16,20 @@ import lombok.Data;
 @Entity
 @Data
 @DiscriminatorValue("STUDENT")
-public class Student extends User{
+public class Student extends User {
 
-    @OneToOne
-    private AcademicLevel academicLevel;
-    
-    @OneToOne
-    private Parent parent;
+  @OneToOne
+  private AcademicLevel academicLevel;
 
-    @ManyToMany
-    private List<Classe> classes;
+  @OneToOne
+  private Parent parent;
 
+  @JsonIgnore
+  @ManyToMany
+  private List<Classe> classes;
 
-      @ManyToMany
-    @JoinTable(
-        name = "student_teacher_follow",
-        joinColumns = @JoinColumn(name = "student_id"),
-        inverseJoinColumns = @JoinColumn(name = "teacher_id")
-    )
-    private List<Teacher> followedTeachers = new ArrayList<>();
+  @JsonIgnore
+  @ManyToMany
+  @JoinTable(name = "student_teacher_follow", joinColumns = @JoinColumn(name = "student_id"), inverseJoinColumns = @JoinColumn(name = "teacher_id"))
+  private List<Teacher> followedTeachers = new ArrayList<>();
 }

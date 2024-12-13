@@ -25,4 +25,11 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
             + "FROM Lesson l JOIN l.classe c JOIN l.teacher t "
             + "WHERE t IN (SELECT ft FROM Student s JOIN s.followedTeachers ft WHERE s.id = :studentId)")
     Page<LessonWithClasseDTO> findAllLessonsByFollowedTeachers(@Param("studentId") Long studentId, Pageable pageable);
+
+    @Query("SELECT new com.moallimi.moallimi.payload.dto.LessonWithClasseDTO(l.id, l.title, l.date, l.description, l.meetLink, l.starTime, l.endTime, l.isValidated, l.isDeleted, l.createdAt, l.updatedAt, "
+    + "new com.moallimi.moallimi.payload.dto.ClasseDTO(c.id, c.title, c.image), "
+    + "new com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO(t.id, t.email, t.username, t.firstName, t.lastName, t.phoneNumber, t.address, t.birthDate, t.image, t.profession, t.cover, t.city, t.about, t.gender, t.isDeleted, t.isSuspended, t.academicSpecialist, t.isApproved, t.website, t.createdAt, t.updatedAt) , "
+    + "l.lessonCategory, l.lessonType) "
+    + "FROM Lesson l JOIN l.classe c JOIN l.teacher t  WHERE l.id = :lessonId")
+    public LessonWithClasseDTO findLessonById(Long lessonId);
 }
