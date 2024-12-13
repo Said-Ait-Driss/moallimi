@@ -76,7 +76,7 @@ export default function NavBar() {
                     ) : (
                         <div className="hidden md:flex space-x-4">
                             <Menu as="div" className="relative inline-block text-left">
-                                <div>
+                                <div className='relative'>
                                     <Menu.Button className={`inline-flex justify-center w-full rounded-full border border-gray-300 shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 ring-2 ring-offset-2 ring-offset-gray-100 ${session?.user?.roles?.[0] == 'ROLE_STUDENT' ? 'ring-primary outline-primary' : 'ring-indigo-400 outline-indigo-400'}`}>
                                         <span className="inline-block h-10 w-10 rounded-full overflow-hidden bg-gray-100">
                                             <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
@@ -84,6 +84,7 @@ export default function NavBar() {
                                             </svg>
                                         </span>
                                     </Menu.Button>
+                                    <span className='rounded-full bg-red-700 text-white p-2 px-3 text-xs font-bold absolute -top-3 -left-4'>2</span>
                                 </div>
 
                                 <Transition
@@ -116,15 +117,15 @@ export default function NavBar() {
                                             </Menu.Item>
                                             <Menu.Item>
                                                 {({ active }) => (
-                                                    <a
-                                                        href="#"
+                                                    <Link
+                                                        href="/dashboard/notification"
                                                         className={classNames(
                                                             active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                                                             'block px-4 py-2 text-sm'
                                                         )}
                                                     >
-                                                        Support
-                                                    </a>
+                                                        Notifications
+                                                    </Link>
                                                 )}
                                             </Menu.Item>
                                             <Menu.Item>

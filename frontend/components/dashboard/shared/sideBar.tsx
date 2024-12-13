@@ -1,6 +1,6 @@
 'use client';
 
-import { PiStudent, PiChalkboardTeacher } from 'react-icons/pi';
+import { PiStudent, PiChalkboardTeacher, PiBell } from 'react-icons/pi';
 import { MdOutlineSpaceDashboard, MdOutlinePlayLesson, MdOutlinePerson3, MdLogout } from 'react-icons/md';
 import { IoBookOutline, IoSettingsOutline } from 'react-icons/io5';
 import { SiBasicattentiontoken } from 'react-icons/si';
@@ -8,6 +8,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { BellIcon } from '@heroicons/react/24/solid';
 
 export default function SideBar() {
     const pathname = usePathname();
@@ -50,7 +51,18 @@ export default function SideBar() {
                     ) : (
                         ''
                     )}
-
+                    <li>
+                        <Link
+                            href="/dashboard/notification"
+                            className={`relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 hover:border-primary pr-6 ${isActive('/dashboard/notification') ? ' border-l-4 border-primary bg-gray-50' : ''}`}
+                        >
+                            <span className="inline-flex justify-center items-center ml-4">
+                                <PiBell />
+                            </span>
+                            <span className="ml-2 text-sm tracking-wide truncate">Notifications</span>
+                            <span className="px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-primary bg-indigo-50 rounded-full">New</span>
+                        </Link>
+                    </li>
                     <li>
                         <Link
                             href="/dashboard/student"
