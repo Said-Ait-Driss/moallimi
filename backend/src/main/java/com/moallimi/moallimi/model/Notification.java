@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -19,8 +21,13 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long from;
-    private Long to;
+    @ManyToOne
+    @JoinColumn(name = "from_user_id")
+    private User from;
+    
+    @ManyToOne
+    @JoinColumn(name = "to_user_id")
+    private User to;
 
     private String content;
     private Boolean isRead = false;

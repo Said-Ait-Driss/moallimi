@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -29,7 +30,7 @@ public class Classe {
     private String image;
 
 
-    @OneToOne
+    @ManyToOne
     private AcademicLevel academicLevel;
 
     @ManyToMany

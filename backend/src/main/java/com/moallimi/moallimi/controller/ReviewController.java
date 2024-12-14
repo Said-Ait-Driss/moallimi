@@ -34,8 +34,4 @@ public class ReviewController extends BaseController{
         return reviewService.getReviewsOfTeacherMadeByStudents(teacherId);
     }
 
-    @GetMapping("/by-parents/{teacherId}")
-    public List<Review> getReviewsOfTeacherMadeByParents(@PathVariable Long teacherId){
-        return reviewService.getReviewsOfTeacherMadeByParents(teacherId);
-    }
 }

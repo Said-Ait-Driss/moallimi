@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.moallimi.moallimi.enums.EnumRole;
 import com.moallimi.moallimi.model.Admin;
-import com.moallimi.moallimi.model.Parent;
 import com.moallimi.moallimi.model.Role;
 import com.moallimi.moallimi.model.Student;
 import com.moallimi.moallimi.model.Teacher;
@@ -76,13 +75,6 @@ public class AuthService {
 
                     user = new Admin();
 
-                    break;
-
-                case "parent":
-                    Role parentRole = roleRepository.findByName(EnumRole.ROLE_PARENT)
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                    roles.add(parentRole);
-                    user = new Parent();
                     break;
 
                 case "teacher":

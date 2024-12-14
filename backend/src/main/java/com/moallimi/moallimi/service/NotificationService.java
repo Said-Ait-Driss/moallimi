@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.moallimi.moallimi.model.Notification;
 import com.moallimi.moallimi.model.Student;
 import com.moallimi.moallimi.model.Teacher;
+import com.moallimi.moallimi.model.User;
 import com.moallimi.moallimi.repository.NotificationRepository;
 import com.moallimi.moallimi.repository.StudentRepository;
 import com.moallimi.moallimi.repository.TeacherRepository;
@@ -32,14 +33,17 @@ public class NotificationService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void notifyTeacherNewFollower(Long teacherId, String firstName, String lastName, Long studentId) {
+    public Notification saveNewNotification(Notification notification) {
+        return notificationRepository.save(notification);
+    }
+
+    public void notifyTeacherNewFollower(User teacher, User student) {
         Notification notification = new Notification();
-        notification.setFrom(teacherId);
-        notification.setTo(studentId);
+        notification.setFrom(teacher);
+        notification.setTo(student);
         notification.setIsRead(false);
-        notification.setContent(firstName + " " + lastName + " Followed you");
-        messagingTemplate.convertAndSend("/topic/teacher/" + teacherId, notification);
-        notificationRepository.save(notification);
+        notification.setContent(student.getLastName() + " " + student.getLastName() + " Followed you");
+        messagingTemplate.convertAndSend("/app/notification", notification);
     }
 
     public Page<Notification> getNotificationsOfUser(int page, int size, Long userId) {

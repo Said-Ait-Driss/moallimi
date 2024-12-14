@@ -12,12 +12,10 @@ import org.springframework.stereotype.Service;
 import com.moallimi.moallimi.enums.AttendenceTypes;
 import com.moallimi.moallimi.model.Lesson;
 import com.moallimi.moallimi.model.LessonSubscriptions;
-import com.moallimi.moallimi.model.Parent;
 import com.moallimi.moallimi.model.Student;
 import com.moallimi.moallimi.payload.response.LessonSubscriptionsWithoutLessonDTO;
 import com.moallimi.moallimi.repository.LessonRepository;
 import com.moallimi.moallimi.repository.LessonSubscriptionsRepository;
-import com.moallimi.moallimi.repository.ParentRepository;
 import com.moallimi.moallimi.repository.StudentRepository;
 
 @Service
@@ -32,8 +30,6 @@ public class LessonSubscriptionsService {
     @Autowired
     private StudentRepository studentRepository;
 
-    @Autowired
-    private ParentRepository parentRepository;
 
     public LessonSubscriptions subscribeToLessonByStudent(Long lessonId, Long studentId) {
         Optional<Lesson> lesson = lessonRepository.findById(lessonId);
@@ -78,32 +74,6 @@ public class LessonSubscriptionsService {
 
     public List<LessonSubscriptions> getSubscribers(Long lessonId) {
         return lessonSubscriptionsRepository.findByLessonId(lessonId);
-    }
-
-    public LessonSubscriptions subscribeToLessonByParent(Long lessonId, Long parentId, Long studentId) {
-        Optional<Lesson> lesson = lessonRepository.findById(lessonId);
-        if (lesson.isEmpty())
-            return null;
-
-        if (lesson.get().getIsDeleted())
-            return null;
-
-        Optional<Student> student = studentRepository.findById(studentId);
-        if (student.isEmpty())
-            return null;
-
-        Optional<Parent> parent = parentRepository.findById(parentId);
-        if (student.isEmpty())
-            return null;
-
-        if (student.get().getParent().getId().equals(parent.get().getId()))
-            return null;
-
-        LessonSubscriptions subscriptions = new LessonSubscriptions();
-        subscriptions.setLesson(lesson.get());
-        subscriptions.setStudent(student.get());
-        subscriptions.setStatus(AttendenceTypes.PENDING);
-        return lessonSubscriptionsRepository.save(subscriptions);
     }
 
     public LessonSubscriptions updateLessonSubscriptions(LessonSubscriptions lessonSubscriptions) {

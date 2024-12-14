@@ -30,9 +30,6 @@ public class Review {
     @OneToOne
     private Student student;
 
-    @OneToOne
-    private Parent parent;
-    
     private Boolean isDeleted = false;
 
     private LocalDateTime createdAt = LocalDateTime.now();

@@ -17,8 +17,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     public List<Review> findByTeacherIdAndStudentIdNotNull(Long teacherId);
 
-    public List<Review> findByTeacherIdAndParentIdNotNull(Long teacherId);
-
     @Query("SELECT new com.moallimi.moallimi.payload.dto.ReviewStatDTO(COUNT(r), COALESCE(AVG(r.rating), 0.0)) " +
             "FROM Review r WHERE r.teacher.id = :teacherId AND r.isDeleted = false")
     ReviewStatDTO findReviewStatsByTeacherId(@Param("teacherId") Long teacherId);

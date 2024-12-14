@@ -33,7 +33,7 @@ public class FollowService {
             studentRepository.save(student);
             teacherRepository.save(teacher);
             // Notify the teacher
-            notificationService.notifyTeacherNewFollower(teacher.getId(),student.getFirstName(),student.getLastName(), student.getId());
+            notificationService.notifyTeacherNewFollower(teacher, student);
         }
     }
 

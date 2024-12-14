@@ -11,19 +11,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
-@Entity
 @Data
+@Entity
 @DiscriminatorValue("STUDENT")
 public class Student extends User {
 
-  @OneToOne(cascade = CascadeType.MERGE)
+  @ManyToOne(cascade = CascadeType.MERGE)
   private AcademicLevel academicLevel;
-
-  @OneToOne
-  private Parent parent;
 
   @JsonIgnore
   @ManyToMany

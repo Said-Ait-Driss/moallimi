@@ -29,8 +29,4 @@ public class ReviewService {
     public List<Review> getReviewsOfTeacherMadeByStudents(Long teacherId){
         return reviewRepository.findByTeacherIdAndStudentIdNotNull(teacherId);
     }
-
-    public List<Review> getReviewsOfTeacherMadeByParents(Long teacherId){
-        return reviewRepository.findByTeacherIdAndParentIdNotNull(teacherId);
-    }
 }

@@ -33,9 +33,6 @@ public class Subscription {
     @OneToOne
     private Plan plan;
 
-    @OneToOne
-    private Parent parent;
-
     private Boolean isDeleted = false;
 
     private LocalDateTime createdAt = LocalDateTime.now();
