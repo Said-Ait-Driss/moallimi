@@ -5,6 +5,8 @@ import { notificationsList } from './notificationAction';
 
 const initialState: notificationState = {
     notifications: [],
+    notificationsBySocket: [],
+    totalElements: 0,
     loading: false,
     error: null
 };
@@ -16,7 +18,7 @@ const notificationSlice = createSlice({
         ADD_NEW_NOTIFICATION(state, action: any) {
             return {
                 ...state,
-                notifications: [...state.notifications, action.payload]
+                notificationsBySocket: [...state.notificationsBySocket, action.payload]
             };
         }
     },
@@ -29,6 +31,7 @@ const notificationSlice = createSlice({
             .addCase(notificationsList.fulfilled, (state, action: PayloadAction<any>) => {
                 state.loading = false;
                 state.notifications = action.payload;
+                state.totalElements = action.payload?.totalElements;
             })
             .addCase(notificationsList.rejected, (state, action: any) => {
                 state.loading = false;
@@ -38,6 +41,7 @@ const notificationSlice = createSlice({
 });
 
 export const { ADD_NEW_NOTIFICATION } = notificationSlice.actions;
+export const selectNotificationsBySocket = (state: RootState) => state.notification.notificationsBySocket;
 export const selectNotifications = (state: RootState) => state.notification.notifications;
 
 export default notificationSlice.reducer;

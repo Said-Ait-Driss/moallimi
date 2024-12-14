@@ -13,7 +13,7 @@ import { Menu, Transition } from '@headlessui/react';
 import { signOut } from 'next-auth/react';
 import WebSocketService from '@/providers/webSocket.provider';
 import Notification from './Notification';
-import { ADD_NEW_NOTIFICATION, selectNotifications } from '@/store/features/notification/notificationSlice';
+import { ADD_NEW_NOTIFICATION, selectNotificationsBySocket } from '@/store/features/notification/notificationSlice';
 
 function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ');
@@ -24,7 +24,7 @@ export default function NavBar() {
     const [show, setShow] = useState(false);
     const [alert, setAlert] = useState({ title: '', message: '', type: '' });
 
-    const notifications = useSelector(selectNotifications);
+    const notifications = useSelector(selectNotificationsBySocket);
 
     const { data: session, status } = useSession();
     const teacherId = session?.user.id;
@@ -50,7 +50,6 @@ export default function NavBar() {
         };
     }, [teacherId]);
     useEffect(() => {
-        console.log('Updated notifications: ', notifications);
         if (notifications.length > 0) {
             setAlert({
                 title: 'new Notification',
@@ -117,7 +116,7 @@ export default function NavBar() {
                                         </span>
                                     </Menu.Button>
                                     {notifications.length ? (
-                                        <span className="rounded-full bg-red-700 text-white p-2 px-3 text-xs font-bold absolute -top-3 -left-4">
+                                        <span className="rounded-full text-red-500 bg-red-50 p-2 px-3 text-xs font-bold absolute -top-3 -left-4">
                                             {notifications.length}
                                         </span>
                                     ) : (

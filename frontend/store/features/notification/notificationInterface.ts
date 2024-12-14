@@ -7,6 +7,8 @@ export interface notification{
 
 export interface notificationState {
     notifications: notification[] | any;
+    notificationsBySocket: notification[] | any;
     loading: boolean;
+    totalElements:any;
     error: string | null;
 }

@@ -8,13 +8,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { BellIcon } from '@heroicons/react/24/solid';
+import { selectNotificationsBySocket } from '@/store/features/notification/notificationSlice';
+import { useSelector } from 'react-redux';
 
 export default function SideBar() {
     const pathname = usePathname();
     const { data: session, status } = useSession();
 
     const isActive = (href: string) => pathname === href;
+    const notifications = useSelector(selectNotificationsBySocket);
 
     return (
         <div className="flex flex-col mt-4 ml-8 w-64">
@@ -60,7 +62,13 @@ export default function SideBar() {
                                 <PiBell />
                             </span>
                             <span className="ml-2 text-sm tracking-wide truncate">Notifications</span>
-                            <span className="px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-primary bg-indigo-50 rounded-full">New</span>
+                            {notifications.length ? (
+                                <span className="px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-red-500 bg-red-50 rounded-full">
+                                    {notifications.length}
+                                </span>
+                            ) : (
+                                ''
+                            )}
                         </Link>
                     </li>
                     <li>
