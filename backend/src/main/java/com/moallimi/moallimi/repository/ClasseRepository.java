@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.moallimi.moallimi.model.Classe;
-import com.moallimi.moallimi.model.Teacher;
 import com.moallimi.moallimi.payload.response.ClassesListResponse;
 
 @Repository
@@ -21,15 +20,15 @@ public interface ClasseRepository extends JpaRepository<Classe, Long> {
                         +
                         "(SELECT COUNT(s) FROM c.students s), c.isDeleted, c.createdAt, c.updatedAt, " +
                         "(SELECT COUNT(s) FROM c.students s WHERE s.id = :studentId) > 0) " +
-                        "FROM Classe c WHERE c.isDeleted = false AND c.academicLevel.id = (SELECT s.academicLevel.id FROM Student s WHERE s.id = :studentId)")
-        Page<ClassesListResponse> findAllActiveClasses(Pageable pageable, Long studentId);
+                        "FROM Classe c WHERE c.isDeleted = false AND c.academicLevel.id = :academicLevelId")
+        Page<ClassesListResponse> findAllActiveClasses(Pageable pageable, Long studentId, Long academicLevelId);
 
         @Query("SELECT new com.moallimi.moallimi.payload.response.ClassesListResponse(c.id, c.title, c.image, c.academicLevel, "
                         +
                         "(SELECT COUNT(s) FROM c.students s), c.isDeleted, c.createdAt, c.updatedAt, " +
                         "(SELECT COUNT(s) FROM c.students s WHERE s.id = :studentId) > 0) " +
-                        "FROM Classe c WHERE c.isDeleted = false AND c.title LIKE %:title% AND c.academicLevel.id = (SELECT s.academicLevel.id FROM Student s WHERE s.id = :studentId)")
+                        "FROM Classe c WHERE c.isDeleted = false AND c.title LIKE %:title% AND c.academicLevel.id = :academicLevelId")
         Page<ClassesListResponse> findByTitleContaining(@Param("title") String title, Pageable pageable,
-                        Long studentId);
+                        Long studentId, Long academicLevelId);
 
 }

@@ -17,6 +17,7 @@ import com.moallimi.moallimi.model.User;
 import com.moallimi.moallimi.payload.dto.ReviewStatDTO;
 import com.moallimi.moallimi.payload.dto.WantedTeacherFieldsDTO;
 import com.moallimi.moallimi.payload.response.TeachersWithReviewsDTO;
+import com.moallimi.moallimi.repository.AcademicLevelRepository;
 import com.moallimi.moallimi.repository.ReviewRepository;
 import com.moallimi.moallimi.repository.StudentRepository;
 import com.moallimi.moallimi.repository.TeacherRepository;
@@ -35,6 +36,9 @@ public class TeacherService {
     private ReviewRepository reviewRepository;
 
     @Autowired
+    private AcademicLevelRepository academicLevelRepository;
+
+    @Autowired
     UserService userService;
 
     public Teacher updateTeacher(Teacher teahcer) {
@@ -42,8 +46,11 @@ public class TeacherService {
     }
 
     public Page<TeachersWithReviewsDTO> getAllTeachers(int page, int size, Long studentId, int filter, String query) {
+        Pageable pageable = PageRequest.of(page, size);
+
         User user = userService.getUserProfile(studentId);
-        AcademicLevel academicLevel;
+        AcademicLevel academicLevel = null;
+        ;
 
         if (user.getRoles() != null && user.getRoles().stream().anyMatch(r -> r.getName() == EnumRole.ROLE_TEACHER)) {
             Teacher teacher = this.getTeacherProfile(studentId);
@@ -52,11 +59,12 @@ public class TeacherService {
                 && user.getRoles().stream().anyMatch(r -> r.getName() == EnumRole.ROLE_STUDENT)) {
             Student student = studentRepository.findById(studentId).get();
             academicLevel = student.getAcademicLevel();
-        } else {
-            academicLevel = new AcademicLevel();
         }
 
-        Pageable pageable = PageRequest.of(page, size);
+        if (academicLevel == null) {
+            academicLevel = academicLevelRepository.findAll().getFirst();
+        }
+
         Page<WantedTeacherFieldsDTO> teachersPage;
 
         switch (filter) {

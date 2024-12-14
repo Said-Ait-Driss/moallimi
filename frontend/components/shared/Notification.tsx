@@ -1,10 +1,26 @@
 /* This example requires Tailwind CSS v2.0+ */
 import { Fragment, useEffect } from 'react';
 import { Transition } from '@headlessui/react';
-import { CheckCircleIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 
 export default function Notification({ type, title, message, show, setShow }: any) {
+    let icon;
+
+    switch (type) {
+        case 'success':
+            icon = <CheckCircleIcon className="h-5 w-5 text-green-400" aria-hidden="true" />;
+            break;
+        case 'error':
+            icon = <XMarkIcon className="h-5 w-5 text-red-400" aria-hidden="true" />;
+            break;
+        case 'info':
+            icon = <InformationCircleIcon className="h-5 w-5 text-blue-400" aria-hidden="true" />;
+            break;
+        default:
+            icon = null; // or a default icon if needed
+    }
+
     useEffect(() => {
         if (show) {
             const timer = setTimeout(() => {
@@ -32,13 +48,7 @@ export default function Notification({ type, title, message, show, setShow }: an
                     <div className="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
                         <div className="p-4">
                             <div className="flex items-start">
-                                <div className="flex-shrink-0">
-                                    {type === 'success' ? (
-                                        <CheckCircleIcon className="h-5 w-5 text-green-400" aria-hidden="true" />
-                                    ) : (
-                                        <XMarkIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
-                                    )}
-                                </div>
+                                <div className="flex-shrink-0">{icon}</div>
                                 <div className="ml-3 w-0 flex-1 pt-0.5">
                                     <p className="text-sm font-medium text-gray-900">{title}</p>
                                     <p className="mt-1 text-sm text-gray-500">{message}</p>

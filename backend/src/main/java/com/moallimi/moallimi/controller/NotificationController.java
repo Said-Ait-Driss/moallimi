@@ -21,7 +21,7 @@ public class NotificationController {
     @Autowired
     NotificationService notificationService;
 
-    @GetMapping("/of-user/{page}/{size}/{userId}")
+    @GetMapping("/all/{page}/{size}/{userId}")
     public Page<Notification> getNotificationsOfUser(@PathVariable("page") int page, @PathVariable("size") int size,
             @PathVariable("userId") Long userId) {
         return notificationService.getNotificationsOfUser(page, size, userId);
@@ -30,6 +30,6 @@ public class NotificationController {
     @MessageMapping("/notification")
     @SendTo("/topic/teacher/{teacherId}")
     public Notification sendMessage(Notification notification) {
-        return notificationService.saveNewNotification(notification);
+        return notification;
     }
 }

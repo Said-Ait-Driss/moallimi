@@ -30,7 +30,7 @@ export default function Student() {
     const dispatch = useAppDispatch();
     const { data: session, status } = useSession();
 
-    let studentId = session?.user.roles.includes('ROLE_STUDENT') ? session.user.id : -1;
+    let studentId = session?.user.id;
 
     const searchParams = useSearchParams();
     const router = useRouter();

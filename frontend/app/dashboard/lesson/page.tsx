@@ -81,13 +81,12 @@ export default function Lessons() {
     useEffect(() => {
         dispatch(SET_LESSONS([]));
         const result = dispatch(lessonsList({ page: page, size, recent, face_to_face, remote, studentId }));
-        if (studentId >= '0') {
-            const result1 = dispatch(classesList({ page: 0, size: 100, studentId, filter: '', query: '' }));
-        }
+        const result1 = dispatch(classesList({ page: 0, size: 100, studentId: session?.user.id, filter: '', query: '' }));
         const result2 = dispatch(lessonCategoriesList());
         const result3 = dispatch(lessonDurationsList());
         return () => {
             result.abort();
+            result1.abort();
             result2.abort();
             result3.abort();
         };
@@ -181,7 +180,7 @@ export default function Lessons() {
                         />
                     </button>
                 </nav>
-                
+
                 {error ? <ErrorAlert title="service not available right now" message="Something wrong went happened please try later ." /> : ''}
                 {lessons?.content?.length > 0
                     ? lessons?.content?.map((lesson: any) => <LessonCard key={lesson?.lesson?.id} lessonProp={lesson} />)

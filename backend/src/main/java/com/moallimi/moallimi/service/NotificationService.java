@@ -39,11 +39,23 @@ public class NotificationService {
 
     public void notifyTeacherNewFollower(User teacher, User student) {
         Notification notification = new Notification();
-        notification.setFrom(teacher);
-        notification.setTo(student);
+        notification.setFrom(student);
+        notification.setTo(teacher);
         notification.setIsRead(false);
         notification.setContent(student.getLastName() + " " + student.getLastName() + " Followed you");
-        messagingTemplate.convertAndSend("/app/notification", notification);
+        messagingTemplate.convertAndSend("/topic/teacher/" + teacher.getId(), notification);
+        saveNewNotification(notification);
+    }
+
+    public void notifyTeacherNewComment(User teacher, User student, String comment) {
+        Notification notification = new Notification();
+        notification.setFrom(student);
+        notification.setTo(teacher);
+        notification.setIsRead(false);
+        notification.setContent(
+                student.getFirstName() + " " + student.getLastName() + " Comment on you post ! \n " + comment);
+        messagingTemplate.convertAndSend("/topic/teacher/" + teacher.getId(), notification);
+        saveNewNotification(notification);
     }
 
     public Page<Notification> getNotificationsOfUser(int page, int size, Long userId) {

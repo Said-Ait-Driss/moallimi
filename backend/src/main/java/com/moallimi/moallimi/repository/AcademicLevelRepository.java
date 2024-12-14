@@ -7,4 +7,6 @@ import com.moallimi.moallimi.model.AcademicLevel;
 
 @Repository
 public interface AcademicLevelRepository extends JpaRepository<AcademicLevel, Long> {
+        boolean existsByName(String name);
+
 }

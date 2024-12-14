@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.moallimi.moallimi.enums.AcademicLevelsSupported;
 import com.moallimi.moallimi.enums.EnumRole;
+import com.moallimi.moallimi.enums.LessonCategories;
 import com.moallimi.moallimi.model.AcademicLevel;
+import com.moallimi.moallimi.model.LessonCategory;
 import com.moallimi.moallimi.model.Student;
 import com.moallimi.moallimi.model.Teacher;
 import com.moallimi.moallimi.model.User;
@@ -17,6 +20,8 @@ import com.moallimi.moallimi.repository.AcademicLevelRepository;
 import com.moallimi.moallimi.repository.StudentRepository;
 import com.moallimi.moallimi.repository.TeacherRepository;
 import com.moallimi.moallimi.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class AcademicLevelService {
@@ -73,5 +78,16 @@ public class AcademicLevelService {
             return ResponseEntity.ok(teacherRepository.save(teacher));
         }
         return ResponseEntity.badRequest().body("You are not either teacher or student !");
+    }
+
+    @Transactional
+    public void createAcademicLevelIfNotExists() {
+        for (AcademicLevelsSupported academicLevelSupported : AcademicLevelsSupported.values()) {
+            if (!academicLevelRepository.existsByName(academicLevelSupported.toString().toLowerCase())) {
+                AcademicLevel academicLevel = new AcademicLevel();
+                academicLevel.setName(academicLevelSupported.toString().toLowerCase());
+                academicLevelRepository.save(academicLevel);
+            }
+        }
     }
 }

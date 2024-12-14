@@ -41,6 +41,8 @@ public class StudentService {
     }
 
     public Page<Student> getAllStudents(int page, int size, Long studentId, int filter, String query) {
+        Pageable pageable = PageRequest.of(page, size);
+
         User user = userService.getUserProfile(studentId);
         AcademicLevel academicLevel;
 
@@ -52,10 +54,13 @@ public class StudentService {
             Student student = studentRepository.findById(studentId).get();
             academicLevel = student.getAcademicLevel();
         } else {
-            academicLevel = new AcademicLevel();
+            return this.studentRepository.findAll(pageable);
         }
 
-        Pageable pageable = PageRequest.of(page, size);
+        if(academicLevel == null){
+            return this.studentRepository.findAll(pageable);
+        }
+
         // return this.studentRepository.findAll(pageable);
         switch (filter) {
             case 1: // Filter by classes

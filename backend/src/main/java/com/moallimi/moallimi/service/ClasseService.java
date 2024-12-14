@@ -10,12 +10,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.moallimi.moallimi.enums.EnumRole;
+import com.moallimi.moallimi.model.AcademicLevel;
 import com.moallimi.moallimi.model.Classe;
 import com.moallimi.moallimi.model.Student;
 import com.moallimi.moallimi.model.Teacher;
+import com.moallimi.moallimi.model.User;
 import com.moallimi.moallimi.payload.response.ClassesListResponse;
+import com.moallimi.moallimi.repository.AcademicLevelRepository;
 import com.moallimi.moallimi.repository.ClasseRepository;
 import com.moallimi.moallimi.repository.StudentRepository;
+import com.moallimi.moallimi.repository.TeacherRepository;
 
 @Service
 public class ClasseService {
@@ -26,6 +31,15 @@ public class ClasseService {
     @Autowired
     private StudentRepository studentRepository;
 
+    @Autowired
+    private TeacherRepository teacherRepository;
+
+    @Autowired
+    private AcademicLevelRepository academicLevelRepository;
+
+    @Autowired
+    UserService userService;
+
     public Classe addClasse(Classe classe) {
         return classeRepository.save(classe);
     }
@@ -33,11 +47,26 @@ public class ClasseService {
     public Page<ClassesListResponse> getAllClasse(int page, int size, Long studentId, int filter, String query) {
 
         Pageable pageable = PageRequest.of(page, size);
+
+        User user = userService.getUserProfile(studentId);
+        AcademicLevel academicLevel = null;
+
+        if (user.getRoles() != null && user.getRoles().stream().anyMatch(r -> r.getName() == EnumRole.ROLE_TEACHER)) {
+            Teacher teacher = teacherRepository.findById(studentId).orElse(null);
+            academicLevel = teacher.getAcademicSpecialist();
+        } else if (user.getRoles() != null
+                && user.getRoles().stream().anyMatch(r -> r.getName() == EnumRole.ROLE_STUDENT)) {
+            Student student = studentRepository.findById(studentId).get();
+            academicLevel = student.getAcademicLevel();
+        }
+        if (academicLevel == null) {
+            academicLevel = academicLevelRepository.findAll().getFirst();
+        }
         switch (filter) {
             case 2: // Filter by academic level
-                return this.classeRepository.findByTitleContaining(query, pageable, studentId);
+                return this.classeRepository.findByTitleContaining(query, pageable, studentId, academicLevel.getId());
             default: // If no valid filter is provided, all classes
-                return this.classeRepository.findAllActiveClasses(pageable, studentId);
+                return this.classeRepository.findAllActiveClasses(pageable, studentId, academicLevel.getId());
         }
     }
 

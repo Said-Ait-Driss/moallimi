@@ -1,16 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { IoIosArrowRoundForward } from 'react-icons/io';
 import { MdOutlineMenu, MdMenuOpen } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { SET_ROLE } from '@/store/features/auth/authSlice';
 import { useSession } from 'next-auth/react';
 import { Fragment } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { signOut } from 'next-auth/react';
+import WebSocketService from '@/providers/webSocket.provider';
+import Notification from './Notification';
+import { ADD_NEW_NOTIFICATION, selectNotifications } from '@/store/features/notification/notificationSlice';
 
 function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ');
@@ -18,7 +21,13 @@ function classNames(...classes: any) {
 
 export default function NavBar() {
     const [isOpen, setIsOpen] = useState(false);
+    const [show, setShow] = useState(false);
+    const [alert, setAlert] = useState({ title: '', message: '', type: '' });
+
+    const notifications = useSelector(selectNotifications);
+
     const { data: session, status } = useSession();
+    const teacherId = session?.user.id;
 
     const dispatch = useDispatch();
     const router = useRouter();
@@ -31,9 +40,30 @@ export default function NavBar() {
         router.push(path);
     };
 
-    const logout = async (e:any) => {
-        e.preventDefault()
-        await signOut({ callbackUrl: "/auth/login", redirect: true  });
+    useEffect(() => {
+        WebSocketService.connect((notification: any) => {
+            dispatch(ADD_NEW_NOTIFICATION(notification));
+        }, teacherId);
+
+        return () => {
+            WebSocketService.disconnect();
+        };
+    }, [teacherId]);
+    useEffect(() => {
+        console.log('Updated notifications: ', notifications);
+        if (notifications.length > 0) {
+            setAlert({
+                title: 'new Notification',
+                message: notifications[notifications.length - 1].content,
+                type: 'info'
+            });
+            setShow(true);
+        }
+    }, [notifications]);
+
+    const logout = async (e: any) => {
+        e.preventDefault();
+        await signOut({ callbackUrl: '/auth/login', redirect: true });
     };
     return (
         <nav className="bg-lightPrimary p-4 md:px-28">
@@ -76,15 +106,23 @@ export default function NavBar() {
                     ) : (
                         <div className="hidden md:flex space-x-4">
                             <Menu as="div" className="relative inline-block text-left">
-                                <div className='relative'>
-                                    <Menu.Button className={`inline-flex justify-center w-full rounded-full border border-gray-300 shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 ring-2 ring-offset-2 ring-offset-gray-100 ${session?.user?.roles?.[0] == 'ROLE_STUDENT' ? 'ring-primary outline-primary' : 'ring-indigo-400 outline-indigo-400'}`}>
+                                <div className="relative">
+                                    <Menu.Button
+                                        className={`inline-flex justify-center w-full rounded-full border border-gray-300 shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 ring-2 ring-offset-2 ring-offset-gray-100 ${session?.user?.roles?.[0] == 'ROLE_STUDENT' ? 'ring-primary outline-primary' : 'ring-indigo-400 outline-indigo-400'}`}
+                                    >
                                         <span className="inline-block h-10 w-10 rounded-full overflow-hidden bg-gray-100">
                                             <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
                                             </svg>
                                         </span>
                                     </Menu.Button>
-                                    <span className='rounded-full bg-red-700 text-white p-2 px-3 text-xs font-bold absolute -top-3 -left-4'>2</span>
+                                    {notifications.length ? (
+                                        <span className="rounded-full bg-red-700 text-white p-2 px-3 text-xs font-bold absolute -top-3 -left-4">
+                                            {notifications.length}
+                                        </span>
+                                    ) : (
+                                        ''
+                                    )}
                                 </div>
 
                                 <Transition
@@ -197,6 +235,7 @@ export default function NavBar() {
                     </div>
                 </div>
             )}
+            <Notification type={alert.type} title={alert.title} message={alert.message} show={show} setShow={setShow} />
         </nav>
     );
 }

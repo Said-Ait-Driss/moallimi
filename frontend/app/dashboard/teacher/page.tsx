@@ -27,7 +27,7 @@ export default function Teacher() {
     const dispatch = useAppDispatch();
     const { data: session, status } = useSession();
 
-    let studentId = session?.user.roles.includes('ROLE_STUDENT') ? session.user.id : -1;
+    let userId = session?.user.id;
 
     const loading = useSelector((state: RootState) => state.teacher.loading);
     const teachers: any = useSelector((state: RootState) => state.teacher.teachers);
@@ -44,7 +44,7 @@ export default function Teacher() {
     const filter = searchParams.get('filter') || -1;
 
     useEffect(() => {
-        const result = dispatch(teachersList({ page, size, studentId, query: sQuery, filter }));
+        const result = dispatch(teachersList({ page, size, userId, query: sQuery, filter }));
         return () => {
             result.abort();
         };
@@ -57,7 +57,7 @@ export default function Teacher() {
         new_searchParams.set('query', query);
 
         const newUrl = `${window.location.pathname}?${new_searchParams.toString()}`;
-        const result = await dispatch(teachersList({ page, size, studentId, query: query, filter: selectedFilter.id.toString() }));
+        const result = await dispatch(teachersList({ page, size, userId, query: query, filter: selectedFilter.id.toString() }));
         if (teachersList.fulfilled.match(result)) {
             router.replace(newUrl);
         }
