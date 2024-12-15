@@ -16,6 +16,7 @@ import com.moallimi.moallimi.model.Classe;
 import com.moallimi.moallimi.model.Student;
 import com.moallimi.moallimi.model.Teacher;
 import com.moallimi.moallimi.model.User;
+import com.moallimi.moallimi.payload.dto.ClassStudentCountDTO;
 import com.moallimi.moallimi.payload.response.ClassesListResponse;
 import com.moallimi.moallimi.repository.AcademicLevelRepository;
 import com.moallimi.moallimi.repository.ClasseRepository;
@@ -133,5 +134,10 @@ public class ClasseService {
         }
 
         return ResponseEntity.badRequest().body("Student or class not found.");
+    }
+
+    // state
+    public List<ClassStudentCountDTO> getClasseStudentCount(){
+        return classeRepository.countStudentsInClasses();
     }
 }

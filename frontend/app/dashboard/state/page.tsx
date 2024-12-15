@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import AcademicLevelsStateChart from '@/components/dashboard/state/academicLevelsStateChart';
 // import Calendar from '@/components/dashboard/state/calendar';
@@ -15,9 +15,8 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/redux';
 import { useAppDispatch } from '@/hooks/appHooks';
-import { globalState } from '@/store/features/state/stateAction';
-import { selectGlobalState } from '@/store/features/state/stateSlice';
-
+import { academicLevelStudentCountState, classeStudentCountState, globalState } from '@/store/features/state/stateAction';
+import { selectAcademicLevelStudentCountState, selectClasseStudentCountState, selectGlobalState } from '@/store/features/state/stateSlice';
 
 export default function State() {
     const dispatch = useAppDispatch();
@@ -25,12 +24,17 @@ export default function State() {
     const error: any = useSelector((state: RootState) => state.state.error);
     const loading: any = useSelector((state: RootState) => state.state.loading);
     const globalStates = useSelector(selectGlobalState);
-
+    const classeStudentCount = useSelector(selectClasseStudentCountState);
+    const academicLevelStudentCount = useSelector(selectAcademicLevelStudentCountState);
 
     useEffect(() => {
         const result = dispatch(globalState());
+        const result1 = dispatch(classeStudentCountState());
+        const result2 = dispatch(academicLevelStudentCountState());
         return () => {
             result.abort();
+            result1.abort();
+            result2.abort();
         };
     }, []);
 
@@ -43,9 +47,7 @@ export default function State() {
             {error ? <ErrorAlert title="service not available right now" message="Something wrong went happened please try later ." /> : ''}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-6">
                 <div className="col-span-8">
-                    {
-                        globalStates && <GeneralState state={globalStates}/>
-                    }
+                    {globalStates && <GeneralState state={globalStates} />}
                     {loading && 'loading'}
                     <h1 className="text-1xl font-semibold text-gray-900 mt-8">Monthly Subscriptions</h1>
                     <SubscriptionsStateChart />
@@ -53,8 +55,8 @@ export default function State() {
                     <LatestLessons />
                 </div>
                 <div className="col-span-4 justify-items-start">
-                    <UsersStateChart />
-                    <AcademicLevelsStateChart />
+                    {classeStudentCount && <UsersStateChart state={classeStudentCount} />}
+                    {academicLevelStudentCount && <AcademicLevelsStateChart state={academicLevelStudentCount} />}
                     <h1 className="text-1xl font-semibold text-gray-900 my-4">Latest Activities</h1>
                     <LatestActivitiesState />
                 </div>
@@ -62,6 +64,3 @@ export default function State() {
         </>
     );
 }
-
-
-

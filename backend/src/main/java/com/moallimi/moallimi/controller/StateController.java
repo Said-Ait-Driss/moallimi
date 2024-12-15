@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.moallimi.moallimi.payload.dto.AcademicLevelStudentCountDTO;
+import com.moallimi.moallimi.payload.dto.ClassStudentCountDTO;
 import com.moallimi.moallimi.payload.dto.MonthlyIncreaseDTO;
+import com.moallimi.moallimi.service.ClasseService;
 import com.moallimi.moallimi.service.EmailService;
 import com.moallimi.moallimi.service.StudentService;
 import com.moallimi.moallimi.service.SubscriptionService;
@@ -33,6 +36,9 @@ public class StateController {
 
     @Autowired
     EmailService emailService;
+
+    @Autowired
+    ClasseService classeService;
 
     @GetMapping("/general")
     public ResponseEntity<?> getGenralState() {
@@ -62,5 +68,16 @@ public class StateController {
         state.add(teachersIncrease);
         state.add(emailIncrease);
         return ResponseEntity.ok(state);
+    }
+
+    @GetMapping("/classe-student-count")
+    public List<ClassStudentCountDTO> getClasseStudentCount() {
+        return classeService.getClasseStudentCount();
+    }
+
+
+    @GetMapping("/academic-level-student-count")
+    public List<AcademicLevelStudentCountDTO> getAcademicLevelStudentCount() {
+        return studentService.getAcademicLevelStudentCount();
     }
 }

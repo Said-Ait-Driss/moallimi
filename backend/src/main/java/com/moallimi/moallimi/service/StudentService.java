@@ -14,6 +14,7 @@ import com.moallimi.moallimi.model.AcademicLevel;
 import com.moallimi.moallimi.model.Student;
 import com.moallimi.moallimi.model.Teacher;
 import com.moallimi.moallimi.model.User;
+import com.moallimi.moallimi.payload.dto.AcademicLevelStudentCountDTO;
 import com.moallimi.moallimi.repository.StudentRepository;
 import com.moallimi.moallimi.repository.TeacherRepository;
 
@@ -75,6 +76,7 @@ public class StudentService {
         }
     }
 
+    // state
     public Long geTotalStudents() {
         return studentRepository.count();
     }
@@ -82,5 +84,9 @@ public class StudentService {
     public Long getTotalOfLastMonth(LocalDateTime startOfPreviousMonth, LocalDateTime endOfPreviousMonth) {
         Long count = studentRepository.findTotalByDateRange(startOfPreviousMonth, endOfPreviousMonth);
         return count;
+    }
+
+    public List<AcademicLevelStudentCountDTO> getAcademicLevelStudentCount() {
+        return studentRepository.countStudentsByAcademicLevel();
     }
 }

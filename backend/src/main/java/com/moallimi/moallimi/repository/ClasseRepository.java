@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.moallimi.moallimi.model.Classe;
+import com.moallimi.moallimi.payload.dto.ClassStudentCountDTO;
 import com.moallimi.moallimi.payload.response.ClassesListResponse;
 
 @Repository
@@ -31,4 +32,8 @@ public interface ClasseRepository extends JpaRepository<Classe, Long> {
         Page<ClassesListResponse> findByTitleContaining(@Param("title") String title, Pageable pageable,
                         Long studentId, Long academicLevelId);
 
+        @Query("SELECT new com.moallimi.moallimi.payload.dto.ClassStudentCountDTO(c.title, COUNT(s)) " +
+                        "FROM Classe c LEFT JOIN c.students s " +
+                        "GROUP BY c.id")
+        List<ClassStudentCountDTO> countStudentsInClasses();
 }
