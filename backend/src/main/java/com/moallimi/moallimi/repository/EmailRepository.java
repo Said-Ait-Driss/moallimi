@@ -17,4 +17,8 @@ public interface EmailRepository extends JpaRepository<Email, Long> {
     Optional<Email> findLastEmailInLastHourByUserId(@Param("oneHourAgo") LocalDateTime oneHourAgo,
             @Param("userId") Long userId,
             @Param("code") String code);
+
+    // state
+    @Query("SELECT COUNT(e) FROM Email e WHERE  e.createdAt >= :startDate AND  e.createdAt < :endDate")
+    Long findTotalByDateRange(LocalDateTime startDate, LocalDateTime endDate);
 }

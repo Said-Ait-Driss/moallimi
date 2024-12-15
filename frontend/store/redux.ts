@@ -7,10 +7,11 @@ import lessonCategoriesReducer from '@/store/features/lessonCategories/lessonCat
 import lessonDurationsReducer from '@/store/features/lessonDuration/lessonDurationSlice';
 import lessonReducer from '@/store/features/lesson/lessonSlice';
 import profileReducer from '@/store/features/profile/profileSlice';
-import lessonDiscussionReducer from "@/store/features/lessonDiscussion/lessonDiscussionSlice"
-import lessonSubscriptionReducer from "@/store/features/lessonSubscription/lessonSubscriptionSlice"
-import academicLevelReducer from "@/store/features/academicLevel/academicLevelSlice"
-import notificationReducer from "@/store/features/notification/notificationSlice"
+import lessonDiscussionReducer from '@/store/features/lessonDiscussion/lessonDiscussionSlice';
+import lessonSubscriptionReducer from '@/store/features/lessonSubscription/lessonSubscriptionSlice';
+import academicLevelReducer from '@/store/features/academicLevel/academicLevelSlice';
+import notificationReducer from '@/store/features/notification/notificationSlice';
+import stateReducer from '@/store/features/state/stateSlice';
 
 import { AuthState } from './features/auth/authInterface';
 import { TeacherState } from './features/teacher/teacherInterface';
@@ -24,6 +25,7 @@ import { LessonDiscussionState } from './features/lessonDiscussion/lessonDiscuss
 import { LessonSubscriptionState } from './features/lessonSubscription/lessonSubscriptionInterface';
 import { academicLevelState } from './features/academicLevel/academicLevelInterface';
 import { notificationState } from './features/notification/notificationInterface';
+import { stateState } from './features/state/stateInterface';
 
 export interface RootState {
     auth: AuthState;
@@ -34,10 +36,11 @@ export interface RootState {
     lessonDuration: LessonDurationsState;
     lesson: LessonState;
     profile: ProfileState;
-    lessonDiscussion: LessonDiscussionState,
-    lessonSubscription: LessonSubscriptionState,
-    academicLevel: academicLevelState,
-    notification: notificationState,
+    lessonDiscussion: LessonDiscussionState;
+    lessonSubscription: LessonSubscriptionState;
+    academicLevel: academicLevelState;
+    notification: notificationState;
+    state: stateState;
 }
 
 export const store = configureStore({
@@ -48,12 +51,13 @@ export const store = configureStore({
         classe: classeReducer,
         lessonCategories: lessonCategoriesReducer,
         lessonDuration: lessonDurationsReducer,
-        lesson:  lessonReducer,
-        profile:  profileReducer,
+        lesson: lessonReducer,
+        profile: profileReducer,
         lessonDiscussion: lessonDiscussionReducer,
-        lessonSubscription : lessonSubscriptionReducer,
+        lessonSubscription: lessonSubscriptionReducer,
         academicLevel: academicLevelReducer,
         notification: notificationReducer,
+        state: stateReducer
     }
 });
 export type AppDispatch = typeof store.dispatch;

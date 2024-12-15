@@ -1,5 +1,7 @@
 package com.moallimi.moallimi.repository;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,4 +37,8 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
                         +
                         "FROM Teacher t WHERE t.academicSpecialist.id = :academicLevelId")
         Page<WantedTeacherFieldsDTO> findAllTeachers(@Param("academicLevelId") Long academicLevelId, Pageable pageable);
+
+        // state
+        @Query("SELECT COUNT(t) FROM Teacher t WHERE t.createdAt >= :startDate AND t.createdAt < :endDate")
+        Long findTotalByDateRange(LocalDateTime startDate, LocalDateTime endDate);
 }

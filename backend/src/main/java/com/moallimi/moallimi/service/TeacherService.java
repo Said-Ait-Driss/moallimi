@@ -1,5 +1,6 @@
 package com.moallimi.moallimi.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,5 +102,15 @@ public class TeacherService {
 
     public Teacher getTeacherProfile(Long userId) {
         return teacherRepository.findById(userId).orElse(null);
+    }
+
+    public Long geTotalTeachers() {
+        return teacherRepository.count();
+    }
+
+    public Long getTotalOfLastMonth(LocalDateTime startOfPreviousMonth, LocalDateTime endOfPreviousMonth) {
+        Long count = teacherRepository.findTotalByDateRange(startOfPreviousMonth, endOfPreviousMonth);
+        return count;
+
     }
 }

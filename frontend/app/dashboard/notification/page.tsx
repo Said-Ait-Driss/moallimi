@@ -12,14 +12,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { selectNotifications } from '@/store/features/notification/notificationSlice';
 import ErrorAlert from '@/components/shared/errorAlert';
 
-const people = [
-    {
-        name: 'Lindsay Walton',
-        imageUrl:
-            'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=3&w=256&h=256&q=80'
-    }
-];
-
 export default function Notification() {
     const { data: session, status } = useSession();
     const dispatch = useAppDispatch();

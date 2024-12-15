@@ -1,5 +1,6 @@
 package com.moallimi.moallimi.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class StudentService {
             return this.studentRepository.findAll(pageable);
         }
 
-        if(academicLevel == null){
+        if (academicLevel == null) {
             return this.studentRepository.findAll(pageable);
         }
 
@@ -74,4 +75,12 @@ public class StudentService {
         }
     }
 
+    public Long geTotalStudents() {
+        return studentRepository.count();
+    }
+
+    public Long getTotalOfLastMonth(LocalDateTime startOfPreviousMonth, LocalDateTime endOfPreviousMonth) {
+        Long count = studentRepository.findTotalByDateRange(startOfPreviousMonth, endOfPreviousMonth);
+        return count;
+    }
 }
