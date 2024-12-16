@@ -1,5 +1,7 @@
 package com.moallimi.moallimi.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moallimi.moallimi.model.Lesson;
+import com.moallimi.moallimi.payload.dto.LessonWithClasseDTO;
 import com.moallimi.moallimi.payload.dto.LessonWithClasseWithSubscriptionsDTO;
 import com.moallimi.moallimi.payload.dto.LessonWithSubscriptionsDTO;
 import com.moallimi.moallimi.service.LessonService;
@@ -38,6 +41,11 @@ public class LessonController {
             @RequestParam(value = "face_to_face", defaultValue = "false") Boolean faceToFace,
             @RequestParam(value = "remote", defaultValue = "false") Boolean remote) {
         return lessonService.getAllLessons(page, size, recent, faceToFace, remote, studentId);
+    }
+
+    @GetMapping("/latest")
+    public List<LessonWithClasseDTO> getLatestLessons() {
+        return lessonService.getLatestLessons();
     }
 
     @GetMapping("/my/{page}/{size}/{studentId}")

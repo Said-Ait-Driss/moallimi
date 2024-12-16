@@ -5,18 +5,22 @@ import AcademicLevelsStateChart from '@/components/dashboard/state/academicLevel
 import GeneralState from '@/components/dashboard/state/generalState';
 import LatestActivitiesState from '@/components/dashboard/state/LatestActivitiesState';
 import LatestLessons from '@/components/dashboard/state/latestLessons';
-import SubscriptionsStateChart from '@/components/dashboard/state/SubscriptionsStateChart';
+import LessonsStateChart from '@/components/dashboard/state/LessonsStateChart';
 import UsersStateChart from '@/components/dashboard/state/usersStateChart';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { selectNotifications } from '@/store/features/notification/notificationSlice';
 import ErrorAlert from '@/components/shared/errorAlert';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/redux';
 import { useAppDispatch } from '@/hooks/appHooks';
-import { academicLevelStudentCountState, classeStudentCountState, globalState } from '@/store/features/state/stateAction';
-import { selectAcademicLevelStudentCountState, selectClasseStudentCountState, selectGlobalState } from '@/store/features/state/stateSlice';
+import { academicLevelStudentCountState, classeStudentCountState, globalState, latestLessons } from '@/store/features/state/stateAction';
+import {
+    selectAcademicLevelStudentCountState,
+    selectClasseStudentCountState,
+    selectGlobalState,
+    selectLatestLessons
+} from '@/store/features/state/stateSlice';
 
 export default function State() {
     const dispatch = useAppDispatch();
@@ -26,15 +30,18 @@ export default function State() {
     const globalStates = useSelector(selectGlobalState);
     const classeStudentCount = useSelector(selectClasseStudentCountState);
     const academicLevelStudentCount = useSelector(selectAcademicLevelStudentCountState);
+    const latestLessonsState = useSelector(selectLatestLessons);
 
     useEffect(() => {
         const result = dispatch(globalState());
         const result1 = dispatch(classeStudentCountState());
         const result2 = dispatch(academicLevelStudentCountState());
+        const result3 = dispatch(latestLessons());
         return () => {
             result.abort();
             result1.abort();
             result2.abort();
+            result3.abort();
         };
     }, []);
 
@@ -49,12 +56,12 @@ export default function State() {
                 <div className="col-span-8">
                     {globalStates && <GeneralState state={globalStates} />}
                     {loading && 'loading'}
-                    <h1 className="text-1xl font-semibold text-gray-900 mt-8">Monthly Subscriptions</h1>
-                    <SubscriptionsStateChart />
+                    <h1 className="text-1xl font-semibold text-gray-900 mt-8">Monthly Lessons</h1>
+                    <LessonsStateChart />
                     <h1 className="text-1xl font-semibold text-gray-900 mt-8">Latest Lessons</h1>
-                    <LatestLessons />
+                    <LatestLessons state={latestLessonsState} />
                 </div>
-                <div className="col-span-4 justify-items-start">
+                <div className="col-span-3 justify-items-start">
                     {classeStudentCount && <UsersStateChart state={classeStudentCount} />}
                     {academicLevelStudentCount && <AcademicLevelsStateChart state={academicLevelStudentCount} />}
                     <h1 className="text-1xl font-semibold text-gray-900 my-4">Latest Activities</h1>

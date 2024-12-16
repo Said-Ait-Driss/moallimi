@@ -64,6 +64,12 @@ public class LessonService {
         return new PageImpl<>(lessonWithSubscriptionsList, pageable, lessonsPage.getTotalElements());
     }
 
+    public List<LessonWithClasseDTO> getLatestLessons() {
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        List<LessonWithClasseDTO> lessons = lessonRepository.getLatestLessons(pageRequest);
+        return lessons;
+    }
+
     public Page<LessonWithSubscriptionsDTO> getMyLessons(int page, int size, Long studentId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
@@ -131,5 +137,15 @@ public class LessonService {
         } else {
             return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         }
+    }
+
+    // state
+    public Long geTotalLessons() {
+        return lessonRepository.count();
+    }
+
+    public Long getTotalOfLastMonth(LocalDateTime startOfPreviousMonth, LocalDateTime endOfPreviousMonth) {
+        Long count = lessonRepository.findTotalByDateRange(startOfPreviousMonth, endOfPreviousMonth);
+        return count;
     }
 }

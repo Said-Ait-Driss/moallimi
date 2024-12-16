@@ -1,12 +1,13 @@
 import { RootState } from '@/store/redux';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { stateState } from './stateInterface';
-import { academicLevelStudentCountState, classeStudentCountState, globalState } from './stateAction';
+import { academicLevelStudentCountState, classeStudentCountState, globalState, latestLessons } from './stateAction';
 
 const initialState: stateState = {
     global: [],
     classeStudentCount: [],
     academicLevelStudentCount: [],
+    latestLessons: [],
     loading: false,
     error: null
 };
@@ -57,11 +58,25 @@ const stateSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             });
+        builder
+            .addCase(latestLessons.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(latestLessons.fulfilled, (state, action: PayloadAction<any>) => {
+                state.loading = false;
+                state.latestLessons = action.payload;
+            })
+            .addCase(latestLessons.rejected, (state, action: any) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
     }
 });
 
 export const selectGlobalState = (state: RootState) => state.state.global;
 export const selectClasseStudentCountState = (state: RootState) => state.state.classeStudentCount;
 export const selectAcademicLevelStudentCountState = (state: RootState) => state.state.academicLevelStudentCount;
+export const selectLatestLessons = (state: RootState) => state.state.latestLessons;
 
 export default stateSlice.reducer;

@@ -16,6 +16,7 @@ import com.moallimi.moallimi.payload.dto.ClassStudentCountDTO;
 import com.moallimi.moallimi.payload.dto.MonthlyIncreaseDTO;
 import com.moallimi.moallimi.service.ClasseService;
 import com.moallimi.moallimi.service.EmailService;
+import com.moallimi.moallimi.service.LessonService;
 import com.moallimi.moallimi.service.StudentService;
 import com.moallimi.moallimi.service.SubscriptionService;
 import com.moallimi.moallimi.service.TeacherService;
@@ -40,6 +41,9 @@ public class StateController {
     @Autowired
     ClasseService classeService;
 
+    @Autowired
+    LessonService lessonService;
+
     @GetMapping("/general")
     public ResponseEntity<?> getGenralState() {
         LocalDateTime now = LocalDateTime.now();
@@ -62,11 +66,17 @@ public class StateController {
         MonthlyIncreaseDTO emailIncrease = new MonthlyIncreaseDTO("Total Emails",
                 emailService.geTotalEmails(),
                 emailService.getTotalOfLastMonth(startOfCurrentMonth, endOfPreviousMonth));
+
+        MonthlyIncreaseDTO LessonsIncrease = new MonthlyIncreaseDTO("Total Lessons",
+                lessonService.geTotalLessons(),
+                lessonService.getTotalOfLastMonth(startOfCurrentMonth, endOfPreviousMonth));
+
         List<MonthlyIncreaseDTO> state = new ArrayList<>();
         state.add(subscriptionIncrease);
         state.add(studentsIncrease);
         state.add(teachersIncrease);
         state.add(emailIncrease);
+        state.add(LessonsIncrease);
         return ResponseEntity.ok(state);
     }
 
@@ -74,7 +84,6 @@ public class StateController {
     public List<ClassStudentCountDTO> getClasseStudentCount() {
         return classeService.getClasseStudentCount();
     }
-
 
     @GetMapping("/academic-level-student-count")
     public List<AcademicLevelStudentCountDTO> getAcademicLevelStudentCount() {

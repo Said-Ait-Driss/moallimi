@@ -7,6 +7,7 @@ export interface stateState {
     global: state[] | any;
     classeStudentCount: state[] | any;
     academicLevelStudentCount: state[] | any;
+    latestLessons: state[] | any;
     loading: boolean;
     error: string | null;
 }

@@ -27,3 +27,12 @@ export const academicLevelStudentCountState = createAsyncThunk('/api/state/acade
         return rejectWithValue(error.response.data.message);
     }
 });
+
+export const latestLessons = createAsyncThunk('/api/lesson/latest', async (_, { rejectWithValue }) => {
+    try {
+        const response: any = await axiosInstance.get(`/api/lesson/latest`);
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response.data.message);
+    }
+});

@@ -15,7 +15,7 @@ export default function GeneralState({ state }: any) {
     return (
         <div>
             <h3 className="text-lg leading-6 font-medium text-gray-900">Last 30 days</h3>
-            <dl className="mt-5 grid grid-cols-1 rounded-lg bg-white overflow-hidden  divide-y divide-gray-200 md:grid-cols-4 md:divide-y-0 md:divide-x space-x-2">
+            <dl className="mt-5 grid grid-cols-1 rounded-lg bg-white overflow-hidden  divide-y divide-gray-200 md:grid-cols-5 md:divide-y-0 md:divide-x space-x-2">
                 {state.map((item: any) => (
                     <div key={item.itemName} className="px-4 py-5 sm:p-6">
                         <dt className="text-sm font-normal text-gray-900">{item.itemName}</dt>

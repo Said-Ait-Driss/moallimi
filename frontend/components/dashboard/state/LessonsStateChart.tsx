@@ -11,7 +11,7 @@ const labels = ["Jun","Feb","Mars","Averil","May","June","July"];
 const data = {
   labels: labels,
   datasets: [{
-    label: 'My First Dataset',
+    label: 'Monthly Lessons',
     data: [65, 59, 80, 81, 56, 55, 40],
     backgroundColor: [
       'rgba(255, 99, 132)',
@@ -35,19 +35,11 @@ const data = {
   }]
 };
 
-export default function SubscriptionsStateChart() {
+export default function LessonsStateChart() {
     return (
         <div className="chart-container mt-8 w-full mx-auto">
             <Bar
                 data={data}
-                options={{
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Most Academic levels subscribed'
-                        }
-                    }
-                }}
             />
         </div>
     );
