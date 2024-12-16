@@ -3,7 +3,6 @@
 import AcademicLevelsStateChart from '@/components/dashboard/state/academicLevelsStateChart';
 // import Calendar from '@/components/dashboard/state/calendar';
 import GeneralState from '@/components/dashboard/state/generalState';
-import LatestActivitiesState from '@/components/dashboard/state/LatestActivitiesState';
 import LatestLessons from '@/components/dashboard/state/latestLessons';
 import LessonsStateChart from '@/components/dashboard/state/LessonsStateChart';
 import UsersStateChart from '@/components/dashboard/state/usersStateChart';
@@ -64,8 +63,6 @@ export default function State() {
                 <div className="col-span-3 justify-items-start">
                     {classeStudentCount && <UsersStateChart state={classeStudentCount} />}
                     {academicLevelStudentCount && <AcademicLevelsStateChart state={academicLevelStudentCount} />}
-                    <h1 className="text-1xl font-semibold text-gray-900 my-4">Latest Activities</h1>
-                    <LatestActivitiesState />
                 </div>
             </div>
         </>
